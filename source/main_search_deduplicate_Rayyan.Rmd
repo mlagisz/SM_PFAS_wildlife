@@ -1,0 +1,85 @@
+---
+title: "main dearch - deduplicate Rayyan"
+author: "ML"
+date: "17/11/2021"
+output:
+  html_document: default
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r mysetup, include=FALSE}
+knitr::opts_chunk$set(error = TRUE) #allow some execution errors for demonstration purposes
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE, comment = "#>")
+sessionInfo()
+
+library(tidyverse)
+library(synthesisr)
+#library(tidystringdist)
+#install.packages("bibliometrix", dependencies=TRUE) ### installs bibliometrix package and dependencies
+#library(bibliometrix)	
+```
+
+**Purpose:**   
+Deduplicate records from all database searches before screening in Rayyan.
+Records were imported into Rayyan and then exported as a .csv file in order to get them in the same format.
+
+After collecting all 5314 undeduplicated records - Rayyan indicates:
+- 6 records with 3 exact matches
+- 90 records with 2 exact matches
+- 2778 records with partial matches that need to be manually resolved
+Since it is extremely time consuming to manually resolve duplicates (only exact matches can be resolved automiatically in Rayyan), initial deduplication is done outside Rayyan, as below.
+
+## Load combined undeduplicated list of references exported from Rayyan
+
+Upload the csv file exported from Rayyan (bibliometrix will not work with .bib or .ris files exported from Rayyan due to some formatting changes happening there).
+
+```{r upload pooled references, eval=TRUE}
+dat <- read.csv("./data/main_search_unduplicated_20211116.csv")
+dim(dat) #2023 19 - note that many fields get collapsed into the "notes" field
+names(dat)
+```
+
+```{r tidy pooled references, eval=TRUE}
+#before deduplicating by title, tidy up and simplify titles
+dat$title2 <- str_replace_all(dat$title,"[:punct:]","") %>% str_replace_all(.,"[ ]+", " ") %>% tolower() # Removing all punctuation and extra white spaces 
+```
+
+```{r remove exact title matches, eval=TRUE}
+#length(unique(dat$title2)) #3724 unique titles
+dat2 <- distinct(dat, title2, .keep_all = TRUE) # select records with unique titles (removes exact duplicates)
+dim(dat2) #3727 records
+
+# Visual check - sort by title and check visually
+#arrange(dat2, title2)$title2 #some semi-duplicates (same paper, with small differences in titles)
+```
+
+```{r deduplicate by fuzzy matching remaining titles, eval=TRUE}
+
+# use string distance to identify likely duplicates - suing library(synthesisr)
+duplicates_string <- find_duplicates(dat2$title2, method = "string_osa", to_lower = TRUE, rm_punctuation = TRUE, threshold = 7)
+#str(duplicates_string)
+
+# manually review those titles to confirm they are duplicates
+manual_checks <- review_duplicates(df$title, duplicates_string)
+#View(manual_checks) #can also use print function here 
+# if needed, manually mark some records as unique (not duplicates) by providing ther number, e.g.
+#new_duplicates <- synthesisr::override_duplicates(duplicates_string, 34)
+
+#extract unique references 
+dat3 <- extract_unique_references(dat2, duplicates_string)
+dim(dat3) #3672 records 21 columns
+names(dat3)
+
+write_refs(dat3, format = "bib", file = "./data/main_search_deduplicated_20211116.bib") #save into a bib file
+write.csv(dat3, "./data/main_search_deduplicated_20211116.csv", row.names = FALSE) #save as a csv file
+```
+
+Next:
+Since Rayyan could not upload above .bib or .csv flies, The main_search_deduplicated_20211116.bib file was imported into Zotero and then exported as a ris file main_search_deduplicated_20211116_Zotero.ris. 
+File main_search_deduplicated_20211116_Zotero.ris was imported into Rayyan project "2021-11-17: Systematic_map_PFAS_in_wildlife_main (3672 articles)".
+Rayyan's deduplication algorithm found further 61 duplicates out of 3672 records.
+After resolving these duplicates, therwe were unique 3665 records for screening.
+
+
