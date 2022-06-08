@@ -1,0 +1,32 @@
+C_length,PFAS_name,Chain_length,New_generation
+3,PFBA,Short-chain,No
+5,PFPeA,Short-chain,No
+6,PFHxA,Short-chain,No
+7,PFHpA,Long-chain,No
+8,PFOA,Long-chain,No
+9,PFNA,Long-chain,No
+10,PFDA,Long-chain,No
+11,PFUnDA,Long-chain,No
+12,PFDoDA,Long-chain,No
+13,PFTrDA,Long-chain,No
+14,PFTA,Long-chain,No
+4,PFBS,Short-chain,No
+5,PFPeS,Short-chain,No
+6,PFHxS,Long-chain,No
+7,PFHpS,Long-chain,No
+8,PFOS,Long-chain,No
+8,PFECHS,Long-chain,No
+10,PFDS,Long-chain,No
+7,ADONA,Short-chain,Yes
+8,Nafion BP2,Long-chain,Yes
+8,6:2 Cl-PFESA,Long-chain,Yes
+10,8:2 Cl-PFESA,Long-chain,Yes
+8,Hydro-Eve,Long-chain,Yes
+6,PFO4DA,Short-chain,Yes
+6,HFPO-DA,Short-chain,Yes
+7,PFO5DoDA,Short-chain,Yes
+9,HFPO-TA,Long-chain,Yes
+8,6:2 FTS,Short-chain,Yes
+10,8:2 FTS,Long-chain,Yes
+8,PFOSA,Long-chain,No
+9,PFNS,Long-chain,No

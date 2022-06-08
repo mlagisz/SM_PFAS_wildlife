@@ -1,0 +1,765 @@
+Study_ID,Country_Region_Sample_Collection,Comments,Checked
+P_0418,Alaska,,CV
+P_0468,Alaska,,CV
+P_0661,Alaska,,CV
+P_0228,Antarctica,no fish,CV
+P_0075,Antarctica,,CV
+P_0283,Antarctica,,CV
+P_0276,Antarctica,,CV
+P_0280,Antarctica,,CV
+P_0405,Antarctica,,CV
+P_0453,Antarctica,,CV
+P_0613,Antarctica,,CV
+P_0623,Antarctica,,CV
+P_0366,Antarctica,,LR
+P_0228,Argentina,fish,CV
+P_0341,Atlantic Ocean,fish,CV
+P_0463,Atlantic Ocean,,CV
+P_0069,Australia,,CV
+P_0056,Australia,,CV
+P_0054,Australia,,CV
+P_0312,Australia,,CV
+P_0313,Australia,,CV
+P_0309,Australia,,CV
+P_0311,Australia,,CV
+P_0305,Australia,,CV
+P_0254,Australia,Excluded,CV
+P_0308,Australia,,CV
+P_0310,Australia,,CV
+P_0394,Australia,,CV
+P_0416,Australia,,CV
+P_0364,Australia,,LR
+P_0381,Australia,,LR
+P_0387,Australia,,LR
+P_0425,Australia,,LR
+P_0434,Australia,,LR
+P_0595,Australia,,LR
+P_0608,Australia,,LR
+P_0271,Austria,,CV
+P_0165,Baltic Sea,,CV
+P_0190,Baltic Sea,,CV
+P_0190,Baltic Sea,,CV
+P_0284,Baltic Sea,,CV
+P_0286,Baltic Sea,,CV
+P_0194,Baltic Sea,,CV
+P_0058,Baltic Sea,fish,CV
+P_0127,Baltic Sea,fish,CV
+P_0146,Baltic Sea,,CV
+P_0183,Baltic Sea,,CV
+P_0026,Baltic Sea,,CV
+P_0579,Baltic Sea,,CV
+P_0661,Baltic Sea,,CV
+P_0549,Baltic Sea,,LR
+P_0592,Baltic Sea,,LR
+P_0598,Baltic Sea,,LR
+P_0448,Bangladesh,,LR
+P_0170,Barents Sea,,CV
+P_0173,Belgium,,CV
+P_0174,Belgium,,CV
+P_0029,Belgium,,CV
+P_0158,Belgium,,CV
+P_0159,Belgium,,CV
+P_0016,Belgium,,CV
+P_0042,Belgium,,CV
+P_0218,Belgium,,CV
+P_0231,Belgium,,CV
+P_0232,Belgium,,CV
+P_0157,Belgium,,CV
+P_0317,Belgium,,CV
+P_0318,Belgium,,CV
+P_0520,Belgium,,CV
+P_0556,Belgium,,CV
+P_0499,Belgium,,LR
+P_0658,Belgium,,LR
+P_0660,Belgium,,LR
+P_0180,Bermuda,,CV
+P_0319,Black Sea,,CV
+P_0059,Bonaire,,CV
+P_0122,Brazil,,CV
+P_0027,Brazil,,CV
+P_0024,Brazil,,CV
+P_0013,Brazil,,CV
+P_0557,Brazil,Excluded,CV
+P_0657,Brazil,,LR
+P_0118,Canada,,CV
+P_0136,Canada,,CV
+P_0137,Canada,,CV
+P_0142,Canada,,CV
+P_0349,Canada,,CV
+P_0067,Canada,,CV
+P_0106,Canada,,CV
+P_0351,Canada,,CV
+P_0150,Canada,,CV
+P_0163,Canada,,CV
+P_0178,Canada,,CV
+P_0179,Canada,,CV
+P_0320,Canada,,CV
+P_0057,Canada,Fish and other,CV
+P_0266,Canada,,CV
+P_0353,Canada,,CV
+P_0314,Canada,,CV
+P_0222,Canada,,CV
+P_0272,Canada,,CV
+P_0090,Canada,,CV
+P_0091,Canada,,CV
+P_0092,Canada,,CV
+P_0093,Canada,,CV
+P_0098,Canada,,CV
+P_0123,Canada,,CV
+P_0147,Canada,,CV
+P_0148,Canada,,CV
+P_0149,Canada,,CV
+P_0055,Canada,,CV
+P_0224,Canada,,CV
+P_0235,Canada,,CV
+P_0242,Canada,,CV
+P_0073,Canada,,CV
+P_0009,Canada,,CV
+P_0223,Canada,,CV
+P_0243,Canada,,CV
+P_0047,Canada,,CV
+P_0043,Canada,,CV
+P_0044,Canada,Excluded,CV
+P_0039,Canada,,CV
+P_0236,Canada,,CV
+P_0388,Canada,,CV
+P_0418,Canada,,CV
+P_0457,Canada,,CV
+P_0506,Canada,,CV
+P_0508,Canada,,CV
+P_0513,Canada,,CV
+P_0515,Canada,,CV
+P_0526,Canada,,CV
+P_0530,Canada,,CV
+P_0573,Canada,,CV
+P_0584,Canada,,CV
+P_0619,Canada,,CV
+P_0622,Canada,,CV
+P_0629,Canada,,CV
+P_0631,Canada,,CV
+P_0661,Canada,,CV
+P_0436,Canada,,LR
+P_0490,Canada,,LR
+P_0491,Canada,,LR
+P_0497,Canada,Excluded,
+P_0501,Canada,,LR
+P_0533,Canada,,LR
+P_0536,Canada,,LR
+P_0542,Canada,,LR
+P_0545,Canada,,LR
+P_0546,Canada,,LR
+P_0547,Canada,,LR
+P_0549,Canada,,LR
+P_0594,Canada,,LR
+P_0638,Canada,,LR
+P_0650,Canada,,LR
+P_0431,Chafarinas Islands,,LR
+P_0612,Chagos archipelago,,CV
+P_0143,China,,CV
+P_0144,China,Excluded,CV
+P_0354,China,,CV
+P_0352,China,,CV
+P_0257,China,,CV
+P_0258,China,,CV
+P_0259,China,,CV
+P_0261,China,,CV
+P_0292,China,,CV
+P_0297,China,,CV
+P_0326,China,,CV
+P_0343,China,,CV
+P_0346,China,Excluded,CV
+P_0103,China,,CV
+P_0182,China,Excluded,CV
+P_0229,China,,CV
+P_0336,China,,CV
+P_0344,China,,CV
+P_0355,China,,CV
+P_0128,China,,CV
+P_0166,China,,CV
+P_0227,China,,CV
+P_0335,China,,CV
+P_0347,China,,CV
+P_0161,China,,CV
+P_0033,China,,CV
+P_0104,China,Excluded,CV
+P_0328,China,,CV
+P_0011,China,,CV
+P_0392,China,,CV
+P_0403,China,,CV
+P_0407,China,,CV
+P_0411,China,,CV
+P_0452,China,,CV
+P_0456,China,,CV
+P_0474,China,,CV
+P_0475,China,,CV
+P_0510,China,,CV
+P_0518,China,,CV
+P_0519,China,,CV
+P_0525,China,,CV
+P_0558,China,Excluded,CV
+P_0561,China,,CV
+P_0566,China,,CV
+P_0568,China,,CV
+P_0617,China,,CV
+P_0630,China,,CV
+P_0665,China,,CV
+P_0666,China,,CV
+P_0667,China,,CV
+P_0363,China,Excluded,LR
+P_0379,China,,LR
+P_0383,China,,LR
+P_0385,China,,LR
+P_0427,China,,LR
+P_0435,China,,LR
+P_0438,China,,LR
+P_0441,China,,LR
+P_0442,China,,LR
+P_0447,China,Excluded,Excluded
+P_0484,China,,LR
+P_0538,China,,LR
+P_0587,China,,LR
+P_0588,China,,LR
+P_0600,China,,LR
+P_0255,Colombia,,CV
+P_0041,Croatia,,CV
+P_0453,Crozet Archipelago,,CV
+P_0101,Czech Republic,,CV
+P_0102,Czech Republic,,CV
+P_0206,Czech Republic,,CV
+P_0172,Czech Republic,,CV
+P_0181,Czech Republic,,CV
+P_0304,Czech Republic,,CV
+P_0574,Czech Republic,,CV
+P_0639,Czech Republic,,LR
+P_0085,Denmark,,CV
+P_0505,Denmark,,LR
+P_0659,Denmark,,LR
+P_0316,Dutch Wadden Sea,,CV
+P_0169,East China Sea,,CV
+P_0034,East China Sea,,CV
+P_0198,Estonia,Excluded,Excluded
+P_0165,Estonia,,CV
+P_0461,Ethiopia,,CV
+P_0599,Ethiopia,,LR
+P_0276,Falkland Islands,UK administration,CV
+P_0084,Faroe Islands,,CV
+P_0083,Faroe Islands,,CV
+P_0350,Faroe Islands,,CV
+P_0272,Faroe Islands,NOT fish,CV
+P_0212,Faroe Islands,,CV
+P_0277,Faroe Islands,,CV
+P_0455,Faroe Islands,,CV
+P_0570,Faroe Islands,,CV
+P_0204,Finland,,CV
+P_0190,Finland,,CV
+P_0569,Finland,,CV
+P_0598,Finland,,LR
+P_0066,France,,CV
+P_0068,France,,CV
+P_0113,France,,CV
+P_0114,France,,CV
+P_0213,France,,CV
+P_0240,France,,CV
+P_0246,France,Excluded,Excluded
+P_0315,France,,CV
+P_0293,France,,CV
+P_0294,France,,CV
+P_0317,France,,CV
+P_0244,France,,CV
+P_0414,France,,CV
+P_0376,France,,LR
+P_0479,France,,LR
+P_0498,France,,LR
+P_0646,France,,LR
+P_0521,Franz Josef Land,,CV
+P_0656,Greenland,,LR
+P_0129,Germany,,CV
+P_0132,Germany,,CV
+P_0074,Germany,,CV
+P_0267,Germany,,CV
+P_0285,Germany,,CV
+P_0331,Germany,,CV
+P_0138,Germany,,CV
+P_0268,Germany,,CV
+P_0131,Germany,,CV
+P_0333,Germany,,CV
+P_0133,Germany,,CV
+P_0065,Germany,,CV
+P_0281,Germany,,CV
+P_0287,Germany,,CV
+P_0046,Germany,,CV
+P_0271,Germany,,CV
+P_0565,Germany,,CV
+P_0620,Germany,,CV
+P_0422,Germany,,LR
+P_0428,Germany,,LR
+P_0500,Germany,,LR
+P_0550,Germany,,LR
+P_0552,Germany,,LR
+P_0586,Germany,,LR
+P_0640,Germany,,LR
+P_0645,Germany,,LR
+P_0651,Germany,,LR
+P_0655,Germany,,LR
+P_0659,Germany,,LR
+P_0276,Gough Island,UK administration,CV
+P_0125,Canary Islands,,CV
+P_0125,Greece,,CV
+P_0473,Greece,,CV
+P_0004,Greenland,,CV
+P_0111,Greenland,,CV
+P_0084,Greenland,,CV
+P_0083,Greenland,,CV
+P_0272,Greenland,NOT fish,CV
+P_0235,Greenland,,CV
+P_0260,Greenland,,CV
+P_0081,Greenland,,CV
+P_0082,Greenland,,CV
+P_0120,Greenland,,CV
+P_0153,Greenland,,CV
+P_0154,Greenland,,CV
+P_0155,Greenland,,CV
+P_0156,Greenland,,CV
+P_0273,Greenland,,CV
+P_0277,Greenland,,CV
+P_0035,Greenland,,CV
+P_0299,Greenland,,CV
+P_0300,Greenland,,CV
+P_0302,Greenland,,CV
+P_0324,Greenland,,CV
+P_0409,Greenland,,CV
+P_0611,Greenland,,CV
+P_0621,Greenland,,CV
+P_0622,Greenland,,CV
+P_0430,Greenland,,LR
+P_0542,Greenland,,LR
+P_0543,Greenland,,LR
+P_0638,Greenland,,LR
+P_0648,Greenland,,LR
+P_0208,Guam,,CV
+P_0196,Gulf of Mexico,,CV
+P_0596,Gulf of Mexico,,LR
+P_0208,Hawaii,,CV
+P_0417,Hawaii,,CV
+P_0371,Hawaii,,LR
+P_0063,Iceland,,CV
+P_0272,Iceland,,CV
+P_0212,Iceland,,CV
+P_0277,Iceland,,CV
+P_0300,Iceland,,CV
+P_0489,Iceland,,LR
+P_0659,Iceland,,LR
+P_0247,India,,CV
+P_0104,India,Excluded,CV
+P_0018,India,,CV
+P_0330,India,,CV
+P_0507,India,,CV
+P_0661,India,,CV
+P_0007,Indian Ocean,,CV
+P_0340,Indian Ocean,,CV
+P_0169,Indian Ocean,,CV
+P_0169,Indonesia,,CV
+P_0151,Italy,,CV
+P_0238,Italy,,CV
+P_0315,Italy,,CV
+P_0051,Italy,,CV
+P_0037,Italy,,CV
+P_0038,Italy,,CV
+P_0462,Italy,,CV
+P_0471,Italy,,CV
+P_0528,Italy,,CV
+P_0560,Italy,,CV
+P_0567,Italy,,CV
+P_0576,Italy,,CV
+P_0581,Italy,,CV
+P_0582,Italy,,CV
+P_0661,Italy,,CV
+P_0663,Italy,,CV
+P_0664,Italy,,CV
+P_0359,Italy,,LR
+P_0424,Italy,,LR
+P_0485,Italy,,LR
+P_0486,Italy,,LR
+P_0609,Italy,,LR
+P_0636,Italy,,LR
+P_0644,Italy,,LR
+P_0010,Japan,,CV
+P_0201,Japan,,CV
+P_0169,Japan,,CV
+P_0247,Japan,,CV
+P_0250,Japan,,CV
+P_0290,Japan,,CV
+P_0164,Japan,,CV
+P_0193,Japan,,CV
+P_0251,Japan,,CV
+P_0047,Japan,,CV
+P_0418,Japan,,CV
+P_0478,Japan,,CV
+P_0507,Japan,,CV
+P_0633,Japan,,CV
+P_0661,Japan,,CV
+P_0535,Japan,,LR
+P_0538,Japan,,LR
+P_0548,Japan,,LR
+P_0135,Japan,,CV
+P_0168,Japan,,CV
+P_0185,Latvia,,CV
+P_0247,Malaysia,,CV
+P_0507,Malaysia,,CV
+P_0400,Mauritius,,CV
+P_0342,Mediterranean Sea,,CV
+P_0194,Mediterranean Sea,,CV
+P_0160,Mediterranean Sea,,CV
+P_0653,Mediterranean Sea,,LR
+P_0606,Mediterranean Sea,,LR
+P_0460,Mexico,,CV
+P_0208,Micronesia,,CV
+P_0195,Midway Atoll,,CV
+P_0107,Midway Atoll,,CV
+P_0612,Mozambique,,CV
+P_0341,Netherlands,,CV
+P_0048,Netherlands,,CV
+P_0317,Netherlands,,CV
+P_0487,Netherlands,,LR
+P_0550,Netherlands,,LR
+P_0609,Netherlands,,LR
+P_0553,New Zealand,,LR
+P_0277,North Atlantic Ocean,,CV
+P_0130,North Atlantic Ocean,,CV
+P_0007,North Pacific Ocean,,CV
+P_0169,North Pacific Ocean,,CV
+P_0134,North Pacific Ocean,,CV
+P_0063,North Sea,,CV
+P_0089,North Sea,Excluded,Excluded
+P_0341,North Sea,fish,CV
+P_0139,North Sea,,CV
+P_0140,North Sea,,CV
+P_0183,North Sea,,CV
+P_0654,North Sea,,LR
+P_0606,North Atlantic Ocean,,LR
+P_0371,Northern Marianas Islands,,LR
+P_0002,Norway,,CV
+P_0005,Norway,,CV
+P_0129,Norway,,CV
+P_0207,Norway,,CV
+P_0165,Norway,,CV
+P_0216,Norway,,CV
+P_0272,Norway,,CV
+P_0079,Norway,,CV
+P_0080,Norway,,CV
+P_0094,Norway,,CV
+P_0095,Norway,,CV
+P_0096,Norway,,CV
+P_0097,Norway,,CV
+P_0112,Norway,,CV
+P_0022,Norway,,CV
+P_0356,Norway,,CV
+P_0171,Norway,,CV
+P_0184,Norway,,CV
+P_0189,Norway,,CV
+P_0200,Norway,,CV
+P_0209,Norway,,CV
+P_0210,Norway,,CV
+P_0211,Norway,,CV
+P_0212,Norway,,CV
+P_0234,Norway,,CV
+P_0235,Norway,,CV
+P_0239,Norway,,CV
+P_0241,Norway,,CV
+P_0248,Norway,,CV
+P_0050,Norway,,CV
+P_0086,Norway,,CV
+P_0031,Norway,,CV
+P_0296,Norway,,CV
+P_0298,Norway,,CV
+P_0045,Norway,,CV
+P_0278,Norway,,CV
+P_0279,Norway,,CV
+P_0288,Norway,,CV
+P_0306,Norway,,CV
+P_0015,Norway,,CV
+P_0028,Norway,,CV
+P_0061,Norway,,CV
+P_0025,Norway,,CV
+P_0302,Norway,,CV
+P_0307,Norway,,CV
+P_0322,Norway,,CV
+P_0329,Norway,,CV
+P_0032,Norway,,CV
+P_0357,Norway,,CV
+P_0275,Norway,,CV
+P_0408,Norway,,CV
+P_0409,Norway,,CV
+P_0410,Norway,,CV
+P_0415,Norway,,CV
+P_0467,Norway,,CV
+P_0509,Norway,,CV
+P_0521,Norway,,CV
+P_0559,Norway,,CV
+P_0578,Norway,,CV
+P_0583,Norway,,CV
+P_0615,Norway,,CV
+P_0625,Norway,,CV
+P_0626,Norway,,CV
+P_0662,Norway,,CV
+P_0361,Norway,,LR
+P_0445,Norway,,LR
+P_0481,Norway,,LR
+P_0495,Norway,We initially decided to note Svalbard down as Norway. It was inconsistent. I fixed it and changed it all to Norway now.,LR
+P_0532,Norway,,LR
+P_0542,Norway,,LR
+P_0549,Norway,,LR
+P_0554,Norway,,LR
+P_0603,Norway,,LR
+P_0605,Norway,,LR
+P_0607,Norway,,LR
+P_0638,Norway,,LR
+P_0659,Norway,,LR
+P_0661,Pacific Ocean,,CV
+P_0104,Pakistan,Excluded,CV
+P_0371,Palmyra Atoll,,LR
+P_0127,Poland,no fish,CV
+P_0303,Poland,,CV
+P_0470,Poland,,CV
+P_0537,Poland,,LR
+P_0431,Portugal,,LR
+P_0503,Portugal,,LR
+P_0541,Portugal,,LR
+P_0276,Prince Edward Islands,,CV
+P_0421,Puerto Rico,,LR
+P_0369,Red Sea,,LR
+P_0108,Reunion Island,,CV
+P_0235,Russia,,CV
+P_0241,Russia,,CV
+P_0186,Russia,,CV
+P_0418,Russia,,CV
+P_0531,Russia,,LR
+P_0208,Saipan,,CV
+P_0349,Scotland,,CV
+P_0262,Scotland,,CV
+P_0169,Sea of Japan,,CV
+P_0134,Sea of Japan,,CV
+P_0041,Serbia,,CV
+P_0521,Severnaya Zemlya,,CV
+P_0245,Seychelles,,CV
+P_0612,Seychelles,,CV
+P_0217,Singapore,Excluded,Excluded
+P_0041,Slovenia,,CV
+P_0612,Somalia,,CV
+P_0010,South Africa,,CV
+P_0321,South Africa,,CV
+P_0088,South Africa,,CV
+P_0087,South Africa,,CV
+P_0105,South Africa,,CV
+P_0399,South Africa,,CV
+P_0412,South Africa,,CV
+P_0433,South Africa,,LR
+P_0451,South Africa,,LR
+P_0007,South Atlantic Ocean,,CV
+P_0214,South China Sea,,CV
+P_0052,South China Sea,Excluded,CV
+P_0215,South Korea,,CV
+P_0221,South Korea,,CV
+P_0049,South Korea,,CV
+P_0176,South Korea,,CV
+P_0249,South Korea,,CV
+P_0072,South Korea,,CV
+P_0193,South Korea,,CV
+P_0019,South Korea,,CV
+P_0012,South Korea,,CV
+P_0104,South Korea,Excluded,CV
+P_0021,South Korea,,CV
+P_0020,South Korea,,CV
+P_0220,South Korea,,CV
+P_0404,South Korea,,CV
+P_0418,South Korea,,CV
+P_0516,South Korea,,CV
+P_0635,South Korea,,CV
+P_0661,South Korea,,CV
+P_0362,South Korea,,LR
+P_0372,South Korea,,LR
+P_0426,South Korea,,LR
+P_0007,South Pacific Ocean,,CV
+P_0300,Southern Baltic Sea,,CV
+P_0007,Southern Ocean,,CV
+P_0233,Spain,,CV
+P_0264,Spain,,CV
+P_0099,Spain,,CV
+P_0340,Spain,,CV
+P_0078,Spain,,CV
+P_0125,Spain,,CV
+P_0053,Spain,,CV
+P_0323,Spain,,CV
+P_0237,Spain,,CV
+P_0413,Spain,,CV
+P_0420,Spain,,CV
+P_0466,Spain,,CV
+P_0469,Spain,,CV
+P_0616,Spain,,CV
+P_0431,Spain,,LR
+P_0502,Spain,,LR
+P_0503,Spain,,LR
+P_0504,Spain,,LR
+P_0551,Spain,,LR
+P_0590,Spain,,LR
+P_0641,Spain,Excluded,
+P_0652,Spain,,LR
+P_0006,Sweden,,CV
+P_0064,Sweden,,CV
+P_0060,Sweden,,CV
+P_0167,Sweden,,CV
+P_0058,Sweden,,CV
+P_0272,Sweden,,CV
+P_0124,Sweden,,CV
+P_0175,Sweden,,CV
+P_0212,Sweden,,CV
+P_0253,Sweden,,CV
+P_0300,Sweden,,CV
+P_0030,Sweden,,CV
+P_0302,Sweden,,CV
+P_0202,Sweden,,CV
+P_0203,Sweden,,CV
+P_0263,Sweden,,CV
+P_0275,Sweden,,CV
+P_0401,Sweden,,CV
+P_0409,Sweden,,CV
+P_0472,Sweden,,CV
+P_0477,Sweden,,CV
+P_0511,Sweden,,CV
+P_0514,Sweden,,CV
+P_0524,Sweden,,CV
+P_0627,Sweden,,CV
+P_0370,Sweden,,LR
+P_0492,Sweden,,LR
+P_0550,Sweden,,LR
+P_0604,Sweden,,LR
+P_0638,Sweden,,LR
+P_0315,Switzerland,,CV
+P_0037,Switzerland,,CV
+P_0609,Switzerland,,LR
+P_0488,Taiwan,,LR
+P_0610,Tanzania,,CV
+P_0386,Tanzania,,LR
+P_0247,Thailand,,CV
+P_0507,Thailand,,CV
+P_0125,Tunisia,,CV
+P_0614,Tunisia,,CV
+P_0390,Uganda,,CV
+P_0130,UK,,CV
+P_0100,UK,,CV
+P_0171,UK,,CV
+P_0219,UK,,CV
+P_0332,UK,,CV
+P_0529,UK,,CV
+P_0550,UK,,LR
+P_0001,USA,,CV
+P_0008,USA,,CV
+P_0119,USA,,CV
+P_0349,USA,,CV
+P_0110,USA,,CV
+P_0188,USA,,CV
+P_0225,USA,,CV
+P_0252,USA,,CV
+P_0265,USA,,CV
+P_0337,USA,,CV
+P_0345,USA,,CV
+P_0057,USA,No fish from US,CV
+P_0289,USA,,CV
+P_0295,USA,,CV
+P_0192,USA,,CV
+P_0177,USA,,CV
+P_0199,USA,,CV
+P_0272,USA,NOT fish,CV
+P_0115,USA,,CV
+P_0116,USA,,CV
+P_0117,USA,,CV
+P_0003,USA,,CV
+P_0147,USA,,CV
+P_0055,USA,,CV
+P_0195,USA,,CV
+P_0224,USA,,CV
+P_0334,USA,,CV
+P_0269,USA,,CV
+P_0270,USA,,CV
+P_0062,USA,,CV
+P_0076,USA,,CV
+P_0126,USA,,CV
+P_0274,USA,,CV
+P_0301,USA,,CV
+P_0180,USA,,CV
+P_0197,USA,,CV
+P_0291,USA,,CV
+P_0300,USA,,CV
+P_0070,USA,,CV
+P_0071,USA,,CV
+P_0109,USA,,CV
+P_0121,USA,,CV
+P_0191,USA,,CV
+P_0196,USA,,CV
+P_0023,USA,,CV
+P_0017,USA,,CV
+P_0014,USA,,CV
+P_0282,USA,Excluded,CV
+P_0348,USA,,CV
+P_0393,USA,,CV
+P_0398,USA,,CV
+P_0406,USA,,CV
+P_0417,USA,,CV
+P_0418,USA,,CV
+P_0419,USA,,CV
+P_0457,USA,,CV
+P_0459,USA,,CV
+P_0476,USA,,CV
+P_0506,USA,,CV
+P_0512,USA,,CV
+P_0515,USA,,CV
+P_0517,USA,,CV
+P_0522,USA,,CV
+P_0523,USA,,CV
+P_0526,USA,,CV
+P_0527,USA,,CV
+P_0562,USA,,CV
+P_0577,USA,,CV
+P_0618,USA,,CV
+P_0629,USA,,CV
+P_0632,USA,,CV
+P_0634,USA,,CV
+P_0661,USA,,CV
+P_0358,USA,,LR
+P_0360,USA,Excluded,LR
+P_0365,USA,,LR
+P_0373,USA,,LR
+P_0378,USA,,LR
+P_0380,USA,,LR
+P_0421,USA,,LR
+P_0437,USA,,LR
+P_0440,USA,,LR
+P_0446,USA,,LR
+P_0450,USA,,LR
+P_0482,USA,,LR
+P_0483,USA,,LR
+P_0493,USA,Excluded,
+P_0496,USA,,LR
+P_0531,USA,,LR
+P_0534,USA,,LR
+P_0539,USA,,LR
+P_0540,USA,,LR
+P_0542,USA,,LR
+P_0544,USA,,LR
+P_0549,USA,,LR
+P_0555,USA,,LR
+P_0593,USA,,LR
+P_0601,USA,,LR
+P_0602,USA,,LR
+P_0637,USA,,LR
+P_0643,USA,,LR
+P_0647,USA,,LR
+P_0649,USA,,LR
+P_0247,Vietnam,,CV
+P_0040,Vietnam,,CV
+P_0507,Vietnam,,CV
+P_0230,,Excluded,Excluded
+P_0162,,Excluded,CV
+P_0226,,Excluded,
+P_0327,,Excluded,CV
+P_0338,,Excluded,CV

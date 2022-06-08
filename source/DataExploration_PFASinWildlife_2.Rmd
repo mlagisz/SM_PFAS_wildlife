@@ -1,0 +1,2140 @@
+---
+title: "DataExplorations_PFASWildlife"
+output: html_document
+---
+
+#Load packages
+```{r pressure, echo=FALSE}
+
+library(googlesheets4)
+library(tidyverse)
+library(ggplot2)
+library(kableExtra)
+library("stringr")
+library(leaflet)  # for plotting maps
+library(maps)     # for plotting maps
+library(magrittr)
+library(plotly)
+library(htmlwidgets)
+library(janitor)
+library(stringr)
+library(networkD3)
+library(dplyr)
+library(webshot)
+
+```
+
+#Set directory
+```{r pressure, echo=FALSE}
+setwd("Z:/SCI/BEES/MMR/Students_Postdocs/Cat/Ideel-Lab_2/PFAS_docus/SystMap_PFASconcWildlife/Data_Analysis")
+```
+
+#Import csv files
+```{r pressure, echo=FALSE}
+Bibliometrics <- read.csv("PFASinWildlife_Bibliometrics.csv")
+Country_Region <- read.csv("PFASinWildlife_Country_Region.csv")
+PFAS_Compounds <- read.csv("PFASinWildlife_PFAS_Compounds.csv")
+Species <- read.csv("Species_clean_Losia.csv")
+PFAS_C_length <- read.csv("PFAS_C_length_2.csv")
+SystematicMap <- read.csv("PFASinWildlife_SystematicMap.csv")
+CriticalAppraisal <- read.csv ('PFASinWildlife_CriticalAppraisal.csv')
+SpeciesGroups <- read.csv ('PFASinWildlife_SpeciesGroups.csv')
+Species_traits <- read.csv("Species_clean_all_traits_Losia.csv")
+
+#View(Bibliometrics)
+#View(Country_Region)
+#View(PFAS_Compounds)
+#View(Species)
+#View(SystematicMap)
+
+#Save & load environment
+
+#save.image(file='DataExploration_PFASinWildlife.RData')
+#load('DataExploration_PFASinWIldlife.RData')
+```
+
+#Bibliometrics data
+```{r pressure, echo=FALSE}
+
+#View(Bibliometrics)
+dim(Bibliometrics)
+
+#Delete first row
+Bibliometrics_2 <- Bibliometrics
+dim(Bibliometrics_2)
+
+#Delete rows with excluded papers
+Bibliometrics_3 <- Bibliometrics_2 %>% filter(!Comment == 'Excluded') 
+dim(Bibliometrics_3)
+
+Bibliometrics_4 <- Bibliometrics_3 %>% filter(!Checked == 'Excluded')
+dim(Bibliometrics_4)
+
+#Delete blank rows
+Bibliometrics_5 <- Bibliometrics_4 %>% filter(!Study_ID == '')
+dim(Bibliometrics_5)
+
+###Check content of columns (upper/lower case etc.)
+Bibliometrics_5 %>% distinct(Study_ID)
+Bibliometrics_5 %>% distinct(Author_year)
+Bibliometrics_5 %>% distinct(Paper_title)
+Bibliometrics_5 %>% distinct(Publication_year)
+Bibliometrics_5 %>% distinct(Country_FirstAuthor)
+
+Bibliometrics_5 %>% count(Country_FirstAuthor)
+Bibliometrics_5 %>% count(Author_year)
+
+n_occur_biblio <- data.frame(table(Bibliometrics_5$Study_ID))
+#594
+
+n_occur_author <- data.frame(table(Bibliometrics_5$Author_year))
+
+dim(Bibliometrics_5)
+#581   7
+
+Bibliometrics_5_distinct <- Bibliometrics_5 %>% distinct(Study_ID, Author_year, .keep_all = TRUE)
+dim(Bibliometrics_5_distinct)
+#581   7
+
+table_Country_first_author <- Bibliometrics_5_distinct %>%
+  group_by(Country_FirstAuthor) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_Country_first_author %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+```
+
+#Country_Region
+```{r pressure, echo=FALSE}
+
+#View(Country_Region)
+dim(Country_Region)
+
+#Delete rows with excluded papers
+Country_Region_2 <- Country_Region %>% filter(!Checked == 'Excluded')
+dim(Country_Region_2)
+Country_Region_3 <- Country_Region_2 %>% filter(!Comments == 'Excluded') 
+dim(Country_Region_3)
+#736   4
+
+#Delete blank rows
+Country_Region_4 <- Country_Region_3 %>% filter(!Country_Region_Sample_Collection == '')
+
+###Check content of columns (upper/lower case etc.)
+Country_Region_4 %>% distinct(Study_ID)
+Country_Region_4 %>% distinct(Country_Region_Sample_Collection)
+Country_Region_4 %>% distinct(Comments)
+
+Country_Region_4_distinct <- Country_Region_4 %>% distinct(Study_ID, Country_Region_Sample_Collection, .keep_all = TRUE)
+dim(Country_Region_4_distinct)
+#735   4
+
+Country_Region_4 %>% count(Country_Region_Sample_Collection)
+
+
+#Delete P_0480 etc. --> Duplicate
+Country_Region_5 <- Country_Region_4 %>% filter (!Study_ID == 'P_0480')
+
+Country_Region_6 <- Country_Region_5 %>% filter (!Study_ID == 'P_0562')
+
+Country_Region_7 <- Country_Region_6 %>% filter (!Study_ID == 'P_0027')
+
+Country_Region_8 <- Country_Region_7 %>% filter (!Study_ID == 'P_0356')
+
+Country_Region_9 <- Country_Region_8 %>% filter (!Study_ID == 'P_0171')
+
+Country_Region_10 <- Country_Region_9 %>% filter (!Study_ID == 'P_0569')
+
+Country_Region_11 <- Country_Region_10 %>% filter (!Study_ID == 'P_0560')
+
+Country_Region_12 <- Country_Region_11 %>% filter (!Study_ID == 'P_0507')
+
+Country_Region_13 <- Country_Region_12 %>% filter (!Study_ID == 'P_0468')
+
+Country_Region_14 <- Country_Region_13 %>% filter (!Study_ID == 'P_0409')
+
+Country_Region_15 <- Country_Region_14 %>% filter (!Study_ID == 'P_0470')
+
+Country_Region_16 <- Country_Region_15 %>% filter (!Study_ID == 'P_0481')
+
+Country_Region_17 <- Country_Region_16 %>% filter (!Study_ID == 'P_0584')
+
+Country_Region_17 %>% distinct(Study_ID)
+#581
+
+setdiff(Bibliometrics_5$Study_ID, Country_Region_17$Study_ID)  
+
+
+dim(Country_Region_17)
+#717   4
+
+Country_Region_distinct <- Country_Region_17 %>% distinct(Study_ID, Country_Region_Sample_Collection, .keep_all = TRUE)
+dim(Country_Region_distinct)
+#716   4
+
+Country_Region_distinct %>% distinct(Study_ID)
+#581
+Country_Region_4 %>% distinct(Country_Region_Sample_Collection)
+#96
+
+table_Country_Region <- Country_Region_distinct %>%
+  group_by(Country_Region_Sample_Collection) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_Country_Region %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+Country_FirstAuthor <- Bibliometrics_5[,c(1,5)]
+Sampling_site <- Country_Region_distinct[,c(1,2)]
+
+Sample_Site_Country_first <- Sampling_site %>% left_join(Country_FirstAuthor)
+
+###US
+Sample_Site_Country_first_US <- Sample_Site_Country_first %>% filter(Country_FirstAuthor == "USA")
+
+Sample_Site_Country_first_US_2 <- Sample_Site_Country_first_US %>% distinct(Study_ID, .keep_all = TRUE)
+dim(Sample_Site_Country_first_US_2)
+#99  3
+
+Sample_Site_Country_first_US_US <- Sample_Site_Country_first_US_2 %>% filter(Country_Region_Sample_Collection == "USA")
+dim(Sample_Site_Country_first_US_US)
+#74 3
+
+Sample_Site_Country_first_US_Alaska <- Sample_Site_Country_first_US_2 %>% filter(Country_Region_Sample_Collection == "Alaska")
+dim(Sample_Site_Country_first_US_Alaska)
+#1 3
+
+#--> The US did 75 studies in it's own country, 24 outside! 
+
+###Canada
+Sample_Site_Country_first_Canada <- Sample_Site_Country_first %>% filter(Country_FirstAuthor == "Canada")
+
+Sample_Site_Country_first_Canada_2 <- Sample_Site_Country_first_Canada %>% distinct(Study_ID, .keep_all = TRUE)
+dim(Sample_Site_Country_first_Canada_2)
+#66  3
+
+Sample_Site_Country_first_Ca_Ca <- Sample_Site_Country_first_Canada_2 %>% filter(Country_Region_Sample_Collection == "Canada")
+dim(Sample_Site_Country_first_Ca_Ca)
+#54 3
+
+#--> The Canada did 54 studies in it's own country, 12 outside! 
+
+###Norway
+Sample_Site_Country_first_Norway <- Sample_Site_Country_first %>% filter(Country_FirstAuthor == "Norway")
+
+Sample_Site_Country_first_Norway_2 <- Sample_Site_Country_first_Norway %>% distinct(Study_ID, .keep_all = TRUE)
+dim(Sample_Site_Country_first_Norway_2)
+#61  3
+
+Sample_Site_Country_first_Nr_Nr <- Sample_Site_Country_first_Norway_2 %>% filter(Country_Region_Sample_Collection == "Norway")
+dim(Sample_Site_Country_first_Nr_Nr)
+#48 3
+
+#--> The Norway did 48 studies in it's own country, 13 outside! 
+
+###China
+Sample_Site_Country_first_China <- Sample_Site_Country_first %>% filter(Country_FirstAuthor == "China")
+
+Sample_Site_Country_first_China_2 <- Sample_Site_Country_first_China %>% distinct(Study_ID, .keep_all = TRUE)
+dim(Sample_Site_Country_first_China_2)
+#63  3
+
+Sample_Site_Country_first_Ch_Ch <- Sample_Site_Country_first_China_2 %>% filter(Country_Region_Sample_Collection == "China")
+dim(Sample_Site_Country_first_Ch_Ch)
+#57 3
+
+#--> The China did 57 studies in it's own country, 6 outside! 
+
+
+```
+
+#PFAS_Compounds
+```{r pressure, echo=FALSE}
+
+#View(PFAS_Compounds)
+dim(PFAS_Compounds)
+
+#Delete rows with excluded papers
+PFAS_Compounds_2 <- PFAS_Compounds %>% filter(!Checked == 'Excluded')
+dim(PFAS_Compounds_2)
+
+PFAS_Compounds_3 <- PFAS_Compounds_2 %>% filter(!PFAS_name_Comment == 'Excluded')
+dim(PFAS_Compounds_3)
+#7132    4
+
+#Delete blank rows
+PFAS_Compounds_4 <- PFAS_Compounds_3 %>% filter(!PFAS_name == '')
+dim(PFAS_Compounds_4)
+#6859    4
+
+###Check content of columns (upper/lower case etc.)
+PFAS_Compounds_4 %>% distinct(Study_ID)
+PFAS_Compounds_4 %>% distinct(PFAS_name)
+PFAS_Compounds_4 %>% distinct(PFAS_name_Comment)
+
+PFAS_Compounds_4 %>% count(PFAS_name)
+
+PFAS_Compounds_4 %>% distinct(Study_ID)
+#593
+
+#Check difference between PFAS_Compounds_4$Study_ID and Bibliometrics_5$Study_ID
+setdiff(Bibliometrics_5$Study_ID, PFAS_Compounds_4$Study_ID)  
+#The following exist in Bibliometrics_5, but not in PFAS_Compounds_5: 0 --> They are the same.
+
+dim(PFAS_Compounds_4)
+#6848    4
+
+PFAS_Compounds_4_distinct <- PFAS_Compounds_4 %>% distinct(Study_ID, PFAS_name,  .keep_all = TRUE)
+dim(PFAS_Compounds_4_distinct)
+#6809    4
+
+#Delete P_0562 etc. --> Duplicate
+PFAS_Compounds_5 <- PFAS_Compounds_4_distinct %>% filter(!Study_ID == 'P_0562')
+
+PFAS_Compounds_6 <- PFAS_Compounds_5 %>% filter (!Study_ID == 'P_0562')
+
+PFAS_Compounds_7 <- PFAS_Compounds_6 %>% filter (!Study_ID == 'P_0027')
+
+PFAS_Compounds_8 <- PFAS_Compounds_7 %>% filter (!Study_ID == 'P_0356')
+
+PFAS_Compounds_9 <- PFAS_Compounds_8 %>% filter (!Study_ID == 'P_0171')
+
+PFAS_Compounds_10 <- PFAS_Compounds_9 %>% filter (!Study_ID == 'P_0569')
+
+PFAS_Compounds_11 <- PFAS_Compounds_10 %>% filter (!Study_ID == 'P_0560')
+
+PFAS_Compounds_12 <- PFAS_Compounds_11 %>% filter (!Study_ID == 'P_0507')
+
+PFAS_Compounds_13 <- PFAS_Compounds_12 %>% filter (!Study_ID == 'P_0468')
+
+PFAS_Compounds_14 <- PFAS_Compounds_13 %>% filter (!Study_ID == 'P_0409')
+
+PFAS_Compounds_15 <- PFAS_Compounds_14 %>% filter (!Study_ID == 'P_0470')
+
+PFAS_Compounds_16 <- PFAS_Compounds_15 %>% filter (!Study_ID == 'P_0481')
+
+PFAS_Compounds_17 <- PFAS_Compounds_16 %>% filter (!Study_ID == 'P_0584')
+
+PFAS_Compounds_18 <- PFAS_Compounds_17 %>% filter (!Study_ID == 'P_0480')
+
+dim(PFAS_Compounds_18)
+#6663    4
+
+PFAS_Compounds_18 %>% distinct(Study_ID)
+#581
+
+PFAS_Compounds_18 %>% distinct(PFAS_name)
+
+table_PFAS_name <- PFAS_Compounds_18 %>%
+  group_by(PFAS_name) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_PFAS_name %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#How many PFAS compounds per study? --> 11
+table(PFAS_Compounds_18$Study_ID)
+
+PFAS_Compounds_18_n <- PFAS_Compounds_18 %>% count (Study_ID)
+mean(PFAS_Compounds_18_n$n)
+#11
+
+max(PFAS_Compounds_18_n$n)
+#26
+
+#How many only studied one?
+PFAS_Compounds_18_n1 <- PFAS_Compounds_18_n %>% filter (n==1)
+
+#Which PFAs compound did those studies look at?
+
+Single_PFAs_compound_studies <- left_join (PFAS_Compounds_18_n1, PFAS_Compounds_18)
+
+
+
+```
+
+#Species
+```{r pressure, echo=FALSE}
+
+#View(Species)
+dim(Species)
+
+###Check content of columns (upper/lower case etc.)
+Species %>% distinct(Study_ID)
+Species %>% distinct(Scientific_name)
+Species %>% distinct(Lay_name)
+
+Species %>% count(Scientific_name)
+Species %>% count(Lay_name)
+
+
+#Check difference between Species_5$Study_ID and Bibliometrics_5$Study_ID
+setdiff(Bibliometrics_5$Study_ID, Species$Study_ID)
+#The following exist in Bibliometrics_5, but not in Species_5: 0
+
+setdiff(Species$Study_ID, Bibliometrics_5$Study_ID)
+#The following exist in Species_5, but not in Species_5: 0 
+
+###Clean-up the mess
+
+#Upper/lower letter issues
+Species$Scientific_name <- str_to_sentence(Species$Scientific_name)
+Species$Lay_name <- str_to_sentence(Species$Lay_name)
+
+#View(Species)
+
+#Check if there are any duplicate rows
+Species_2 <- Species[!duplicated(Species), ]
+
+dim(Species_2)
+#2356        3
+
+Species_2 %>% distinct(Study_ID)
+#581
+
+Species_distinct <- Species_2 %>% distinct(Study_ID, Scientific_name,  .keep_all = TRUE)
+dim(Species_distinct)
+#2356        3
+
+Species_distinct_2 <- Species_distinct %>% distinct(Study_ID, Lay_name,  .keep_all = TRUE)
+dim(Species_distinct_2)
+#2355    3
+
+Species_distinct_2 %>% distinct(Scientific_name)
+Species_distinct_2 %>% distinct(Lay_name)
+
+table_species <- Species_distinct_2 %>%
+  group_by(Scientific_name) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+```
+
+#Species_traits
+```{r pressure, echo=FALSE}
+
+Species_traits %>% distinct(Study_ID)
+
+#Scientific name
+table_species <- Species_traits %>%
+  group_by(Scientific_name) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#How many species in total?
+Species_traits_species <- Species_traits %>% filter (Name_tax_rank== 'species')
+dim(Species_traits_species)
+
+Species_traits_species %>% distinct(Scientific_name)
+#886
+
+Species_traits_HigherTaxa <- Species_traits %>% filter (!Name_tax_rank== 'species')
+Species_traits_HigherTaxa %>% distinct(Scientific_name)
+#156
+
+#Lay name
+table_species_lay <- Species_traits %>%
+  group_by(Lay_name) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species_lay %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#How many lay names?
+Species_traits_species %>% distinct(Lay_name)
+#886
+
+
+#Class
+table_species_class <- Species_traits %>%
+  group_by(Species_higher_taxon) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species_class %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#How many classes?
+Species_traits %>% distinct(Species_higher_taxon)
+#26
+
+#redlistCategory
+table_species_IUCN <- Species_traits %>%
+  group_by(redlistCategory) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species_IUCN %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#Economically_relevant
+table_species_eco <- Species_traits %>%
+  group_by(Economically_relevant) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species_eco %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#Charismatic_species
+table_species_charisma <- Species_traits %>%
+  group_by(Charismatic_species) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species_charisma %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#Dietary_class
+table_species_diet <- Species_traits %>%
+  group_by(Dietary_class) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species_diet %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#Weight
+mean(Species_traits$Weight)
+
+#Delete rows with NA
+Species_traits_no_NA <- na.omit(Species_traits)
+
+Species_traits_no_NA_2 <- Species_traits_no_NA %>% distinct(Scientific_name, Weight)
+
+mean(Species_traits_no_NA_2$Weight)
+#500,057g
+
+max(Species_traits_no_NA_2$Weight)
+#7e+07
+min(Species_traits_no_NA_2$Weight)
+#5.13
+
+#Dietary_class
+table_species_diet <- Species_traits %>%
+  group_by(Dietary_class) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+#How many species per study?
+table(Species_traits$Study_ID)
+
+Species_traits_n <- Species_traits %>% count (Study_ID)
+mean(Species_traits_n$n)
+#4
+
+max(Species_traits_n$n)
+#34
+
+#How many only studied one?
+Species_traits_n1 <- Species_traits_n %>% filter (n==1)
+#261
+
+#Which species compound did those studies look at?
+Species_traits_studies_1 <- left_join (Species_traits_n1, Species_traits)
+
+table_1_Species_higher_taxon <- Species_traits_studies_1 %>%
+  group_by(Species_higher_taxon) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+```
+
+### Animal group
+```{r pressure, echo=FALSE}
+
+#View(SpeciesGroups)
+dim(SpeciesGroups)
+#581   5
+
+#Delete blank rows
+SpeciesGroups_2 <- SpeciesGroups %>% filter(!Study_ID == '')
+dim(SpeciesGroups_2)
+#581   5
+
+setdiff(Bibliometrics_5$Study_ID, SpeciesGroups_2$Study_ID)
+# 0
+setdiff(SpeciesGroups_2$Study_ID, Bibliometrics_5$Study_ID)
+#
+
+SpeciesGroups_distinct <- SpeciesGroups_2 %>% distinct(Study_ID, .keep_all = TRUE)
+dim(SpeciesGroups_distinct)
+#581   5
+
+###Check content of columns (upper/lower case etc.)
+SpeciesGroups_distinct %>% distinct(Study_ID)
+SpeciesGroups_distinct %>% distinct(Bird)
+SpeciesGroups_distinct %>% distinct(Fish)
+SpeciesGroups_distinct %>% distinct(Marine_Mammals)
+SpeciesGroups_distinct %>% distinct(Other)
+
+#How many Bird, Fish etc.
+
+#Bird
+dim(SpeciesGroups_distinct %>% filter (Bird =='Bird'))
+#166 --> 29%
+
+#Fish
+dim(SpeciesGroups_distinct %>% filter (Fish =='Fish'))
+#277 --> 48%
+
+#Marine_Mammal
+dim(SpeciesGroups_distinct %>% filter (Marine_Mammals =='Marine Mammals'))
+#112 --> 19%
+
+#Other
+dim(SpeciesGroups_distinct %>% filter (Other =='Other'))
+#171 --> 29%
+
+```
+
+
+#SystematicMap
+```{r pressure, echo=FALSE}
+
+#View(SystematicMap)
+dim(SystematicMap)
+
+#Delete rows with excluded papers
+SystematicMap_2 <- SystematicMap %>% filter(!Checked == 'Excluded')
+dim(SystematicMap_2)
+
+#Delete blank rows
+SystematicMap_3 <- SystematicMap_2 %>% filter(!PFAS_focus == '')
+dim(SystematicMap_3)
+
+#Delete excluded papers
+SystematicMap_4 <- SystematicMap_3 %>% filter(!PFAS_focus == 'Excluded')
+dim(SystematicMap_4)
+
+SystematicMap_5 <- SystematicMap_4 %>% filter(!Study_comment == 'Excluded')
+dim(SystematicMap_5)
+#599
+
+SystematicMap_6 <- SystematicMap_5 %>% filter(!Study_comment == 'Exclude')
+dim(SystematicMap_6)
+#599
+
+#View(SystematicMap_6)
+
+###Check content of columns (upper/lower case etc.)
+SystematicMap_6 %>% distinct(Study_ID)
+SystematicMap_6 %>% distinct(PFAS_focus)
+SystematicMap_6 %>% distinct(PFAS_one_many)
+SystematicMap_6 %>% distinct(Year_sampling_start)
+SystematicMap_6 %>% distinct(Year_sampling_end)
+SystematicMap_6 %>% distinct(Species_one_many)
+SystematicMap_6 %>% distinct(Habitat)
+SystematicMap_6 %>% distinct(Developmental_stage)
+SystematicMap_6 %>% distinct(Functional_aspects)
+SystematicMap_6 %>% distinct(Biogeographical_region)
+SystematicMap_6 %>% distinct(Tissue_one_many)
+
+n_occur_systmap <- data.frame(table(SystematicMap_6$Study_ID))
+
+SystematicMap_6 %>% distinct(Study_ID)
+#581
+
+dim(SystematicMap_6)
+#581  24
+
+#View(SystematicMap_6)
+
+###PFAS_focus
+table_species <- SystematicMap_6 %>%
+  group_by(PFAS_focus) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+###PFAS_one_many
+table_species <- SystematicMap_6 %>%
+  group_by(PFAS_one_many) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+##########################
+###Year_sampling_start
+table_species <- SystematicMap_6 %>%
+  group_by(Year_sampling_start) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+
+table_period_start <- SystematicMap_6 %>%
+  group_by(Year_sampling_start) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(Year_sampling_start))
+
+table_period_start %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+
+###Year_sampling_end
+table_species <- SystematicMap_6 %>%
+  group_by(Year_sampling_end) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+table_period_end <- SystematicMap_6 %>%
+  group_by(Year_sampling_end) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(Year_sampling_end))
+
+table_period_end %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+###Make new column Year_sampling_start minus Year_sampling_end
+
+SystematicMap_7 <- SystematicMap_6
+
+SystematicMap_7$Year_sampling_start <- as.numeric(SystematicMap_7$Year_sampling_start)
+SystematicMap_7$Year_sampling_end <- as.numeric(SystematicMap_7$Year_sampling_end)
+
+SystematicMap_7$SamplingPeriod <- (SystematicMap_7$Year_sampling_end - SystematicMap_7$Year_sampling_start)
+
+SystematicMap_No_NA <- na.omit(SystematicMap_7)
+
+mean(SystematicMap_No_NA$SamplingPeriod)
+#4.22905
+
+max(SystematicMap_No_NA$SamplingPeriod)
+#48
+
+#Which studies had 48 years of study period?
+
+SystematicMap_No_NA %>% filter (SamplingPeriod == 48)
+#P_0058
+
+table_SamplingPeriod <- SystematicMap_No_NA %>%
+  group_by(SamplingPeriod) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(SamplingPeriod))
+
+table_SamplingPeriod %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+table_SamplingPeriod_2 <- SystematicMap_No_NA %>%
+  group_by(SamplingPeriod) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_SamplingPeriod_2 %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#How many studies with 0 years period
+SystematicMap_No_NA_0 <- SystematicMap_No_NA %>% filter(SamplingPeriod == 0)
+dim(SystematicMap_No_NA_0)
+#230  25
+
+#How many studies with 1 years period
+SystematicMap_No_NA_1 <- SystematicMap_No_NA %>% filter(SamplingPeriod == 1)
+dim(SystematicMap_No_NA_1)
+#101  25
+
+#How many studies with 5 years period
+SystematicMap_No_NA_5 <- SystematicMap_No_NA %>% filter(SamplingPeriod == 5)
+dim(SystematicMap_No_NA_5)
+#13 25
+
+#Create histogram with SamplingPeriod
+
+SamplingPeriod_hist <- 
+  ggplot(SystematicMap_7, aes(x=SamplingPeriod)) + geom_histogram(color="black", fill="grey") + 
+  theme_minimal() +
+  labs(y="Count", x = "Sampling period in years")
+
+#ggsave("SamplingPeriod_hist.jpg", plot = SamplingPeriod_hist, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+#Non-stacked barplot with animal classes
+
+Sampling_Period <- SystematicMap_7[,c(1,25)]
+Class
+
+#Join Sampling_Period and Class
+Sampling_Period_Class <- Sampling_Period %>% left_join(Class)
+
+dim(Sampling_Period)
+#581
+
+Sampling_Period_no_NA <-na.omit(Sampling_Period)
+dim(Sampling_Period_no_NA)
+#537   2
+
+
+Sampling_Period_Class_2 <- Sampling_Period_Class %>%
+  group_by(SamplingPeriod, Species_higher_taxon) %>%
+  summarise(n = n())
+
+
+
+
+
+#Delete rows with NA
+Sampling_Period_Class_no_NA <- na.omit(Sampling_Period_Class_2)
+dim(Sampling_Period_Class_no_NA)
+#161
+
+#Filter out rare classes
+dim(Sampling_Period_Class_2)
+# 174   3
+
+dim(table_species_class)
+#26  2
+
+table_species_class_5 <- table_species_class %>% filter (n_studies > 3)
+dim(table_species_class_5)
+#15  2
+
+Sampling_Period_Class_no_NA_2 <- Sampling_Period_Class_no_NA %>% filter (!Species_higher_taxon == 'Rotifera')
+Sampling_Period_Class_no_NA_3 <- Sampling_Period_Class_no_NA_2 %>% filter (!Species_higher_taxon == 'Ophiuroidea')
+Sampling_Period_Class_no_NA_4 <- Sampling_Period_Class_no_NA_3 %>% filter (!Species_higher_taxon == 'Holothuroidea')
+Sampling_Period_Class_no_NA_5 <- Sampling_Period_Class_no_NA_4 %>% filter (!Species_higher_taxon == 'Echinoidea')
+Sampling_Period_Class_no_NA_6 <- Sampling_Period_Class_no_NA_5 %>% filter (!Species_higher_taxon == 'Chilopoda')
+Sampling_Period_Class_no_NA_7 <- Sampling_Period_Class_no_NA_6 %>% filter (!Species_higher_taxon == 'Ascidiacea')
+Sampling_Period_Class_no_NA_8 <- Sampling_Period_Class_no_NA_7 %>% filter (!Species_higher_taxon == 'Nematoda')
+Sampling_Period_Class_no_NA_9 <- Sampling_Period_Class_no_NA_8 %>% filter (!Species_higher_taxon == 'Hyperoartia')
+Sampling_Period_Class_no_NA_10 <- Sampling_Period_Class_no_NA_9 %>%filter (!Species_higher_taxon == 'Hexanauplia')
+Sampling_Period_Class_no_NA_11 <- Sampling_Period_Class_no_NA_10%>% filter (!Species_higher_taxon == 'Diplopoda')
+Sampling_Period_Class_no_NA_12 <- Sampling_Period_Class_no_NA_11%>% filter (!Species_higher_taxon == 'Asteroidea')
+
+Sampling_Period_Class_no_NA_13<- Sampling_Period_Class_no_NA_12 %>%filter (!Species_higher_taxon == 'Branchiopoda')
+Sampling_Period_Class_no_NA_14<- Sampling_Period_Class_no_NA_13 %>%filter (!Species_higher_taxon == 'Arachnida')
+Sampling_Period_Class_no_NA_15<- Sampling_Period_Class_no_NA_14%>%filter (!Species_higher_taxon == 'Amphibia')
+Sampling_Period_Class_no_NA_16<- Sampling_Period_Class_no_NA_15%>%filter (!Species_higher_taxon == 'Polychaeta')
+Sampling_Period_Class_no_NA_17<- Sampling_Period_Class_no_NA_16%>%filter (!Species_higher_taxon == 'Clitellata')
+dim(Sampling_Period_Class_no_NA_17)
+#131
+
+Sampling_Period_Class_no_NA_SHORT <- Sampling_Period_Class_no_NA_17
+
+Sampling_Period_Class_no_NA_SHORT$LOG <- log2(Sampling_Period_Class_no_NA_SHORT$n +1)
+
+Sampling_Period_Class_bar <- ggplot(data=Sampling_Period_Class_no_NA_SHORT, aes(x = SamplingPeriod, y = LOG , fill = Species_higher_taxon)) +
+  geom_bar(stat="identity",position=position_dodge())  + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Log2-transformed count", x = "Sampling period in years") +
+  theme(legend.position = "top") + 
+  labs(fill = "Class") +
+  scale_fill_manual(values=c("blue", "red","yellow", "black", "dark gray", "dark green", "dark red","purple", "pink",  "orange"))  +
+  theme(legend.position = "top")  +
+  scale_x_continuous(breaks = c(0,1,2,3,4,5, 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50))
+
+#ggsave("Sampling_Period_Class_bar.jpg", plot = Sampling_Period_Class_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+
+#############
+
+###Species_one_many
+table_species <- SystematicMap_6 %>%
+  group_by(Species_one_many) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+###Habitat
+table_species <- SystematicMap_6 %>%
+  group_by(Habitat) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+###Sex
+table_species <- SystematicMap_6 %>%
+  group_by(Sex) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+###Developmental_stage
+table_species <- SystematicMap_6 %>%
+  group_by(Developmental_stage) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+###Functional_aspects
+table_species <- SystematicMap_6 %>%
+  group_by(Functional_aspects) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+###Biogeographical_region
+table_species <- SystematicMap_6 %>%
+  group_by(Biogeographical_region) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+###Tissue_one_many
+table_species <- SystematicMap_6 %>%
+  group_by(Tissue_one_many) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_species %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+```
+
+
+#Critical appraisal
+```{r pressure, echo=FALSE}
+
+#View(CriticalAppraisal)
+dim(CriticalAppraisal)
+#578  12
+
+
+###Check content of columns (upper/lower case etc.)
+CriticalAppraisal %>% distinct(Study_ID)
+CriticalAppraisal %>% distinct(COI_statement)
+CriticalAppraisal %>% distinct(COI_present)
+CriticalAppraisal %>% distinct(Funding_statement)
+CriticalAppraisal %>% distinct(Funding_government)
+CriticalAppraisal %>% distinct(Funding_NGO)
+CriticalAppraisal %>% distinct(Funding_industry)
+CriticalAppraisal %>% distinct(Raw_data)
+CriticalAppraisal %>% distinct(Analysis_code)
+
+summary(CriticalAppraisal)
+
+CriticalAppraisal_distinct <- CriticalAppraisal %>% distinct(Study_ID, .keep_all = TRUE)
+dim(CriticalAppraisal_distinct)
+#581  12
+
+###
+
+Funding <- CriticalAppraisal_distinct[,c(1,4)]
+
+PubYear_Funding_Statement <- Funding %>% left_join(Pub_Year)
+
+table_Funding_Statement <- PubYear_Funding_Statement %>%
+  group_by(Publication_year) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+Funding_Pub_Year
+
+
+
+```
+
+
+
+
+#######################################
+####Preliminary data analysis
+
+### Bibliometric data
+```{r pressure, echo=FALSE}
+
+#Publication_year
+Publication_year_bar <- Bibliometrics_5_distinct %>% 
+  ggplot(aes(x = Publication_year)) + 
+  geom_bar(alpha = 0.7, colour = "black") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Publication Year")  +
+  scale_x_continuous(breaks = c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,2021, 2022))
+
+Publication_year_bar
+
+#ggsave("Publication_year_bar.jpg", plot = Publication_year_bar, device = 'jpg', width = 168, height = 100, units = "mm",
+#       dpi = 300, limitsize = TRUE)
+
+
+Bibliometrics_5_distinct_10 <- Bibliometrics_5_distinct %>% group_by (Publication_year) %>%
+  summarise(n = n())
+
+
+# ingest data
+cnt_year <- Bibliometrics_5_distinct %>%
+  count(Publication_year)
+
+pub_year_count_line <- ggplot(cnt_year, aes(x= Publication_year, y= n)) +
+  geom_line() +  
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  labs(y="Count", x = "Publication Year")  +
+  theme_minimal()
+
+pub_year_count_line
+
+#Country_FirstAuthor
+Country_FirstAuthor_bar <- Bibliometrics_5_distinct %>% 
+  group_by(Country_FirstAuthor) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Country_FirstAuthor, -n), y=n)) + 
+  geom_bar(stat="identity") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))  +
+  coord_flip() + 
+  theme_minimal() + 
+  labs(y="Count", x = "Country of first author", fill = "Country_FirstAuthor")
+Country_FirstAuthor_bar
+
+#ggsave("First_author.jpg", plot = Country_FirstAuthor_bar, device = 'jpg', width = #168, height = 100, units = "mm",
+#       dpi = 300, limitsize = TRUE)
+
+###
+#Delete all countries that only appeared once
+Country_FirstAuthor_2 <- Bibliometrics_5_distinct[Bibliometrics_5_distinct$Country_FirstAuthor %in% names(which(table(Bibliometrics_5_distinct$Country_FirstAuthor) > 3)), ]
+dim(Country_FirstAuthor_2)
+#557   7
+
+Country_FirstAuthor_bar <- Country_FirstAuthor_2 %>% 
+  group_by(Country_FirstAuthor) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Country_FirstAuthor, -n), y=n)) + 
+  geom_bar(stat="identity") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))  +
+  coord_flip() + 
+  theme_minimal() + 
+  labs(y="Count", x = "Country of first author", fill = "Country_FirstAuthor")
+
+Country_FirstAuthor_bar
+
+#ggsave("Country_FirstAuthor_bar.jpg", plot = Country_FirstAuthor_bar, device = 'jpg', width = 168, height = 100, units = "mm",
+#       dpi = 300, limitsize = TRUE)
+
+```
+
+###Country_Region
+```{r pressure, echo=FALSE}
+
+#Country_Region_Sample_Collection
+
+Country_Region_Sample_Collection_bar <- Country_Region_distinct %>% 
+  group_by(Country_Region_Sample_Collection) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Country_Region_Sample_Collection, -n), y=n)) + 
+  geom_bar(stat="identity") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))  +
+  coord_flip() + 
+  theme_minimal() + 
+  labs(y="Count", x = "Country of sample collection", fill = "Country_Region_Sample_Collection")
+
+Country_Region_Sample_Collection_bar
+
+dim(Country_Region_distinct)
+#716   4
+
+#Delete all countries that appeared 3 times or less
+Country_Region_distinct_3 <- Country_Region_distinct[Country_Region_distinct$Country_Region_Sample_Collection %in% names(which(table(Country_Region_distinct$Country_Region_Sample_Collection) > 3)), ]
+dim(Country_Region_distinct_3)
+#616   4
+
+Country_Region_Sample_Collection_bar_3 <- Country_Region_distinct_3 %>% 
+  group_by(Country_Region_Sample_Collection) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Country_Region_Sample_Collection, -n), y=n)) + 
+  geom_bar(stat="identity") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip() + 
+  theme_minimal() + 
+  labs(y="Count", x = "Country or region of sample collection")
+
+Country_Region_Sample_Collection_bar_3
+
+#ggsave("Country_Region_Sample_Collection_bar.jpg", plot = Country_Region_Sample_Collection_bar_3, device = 'jpg', width = 168, height = 100, units = "mm",      #dpi = 300, limitsize = TRUE)
+
+```
+
+### pfas compound counts
+```{r pressure, echo=FALSE}
+
+pfas_bar <- PFAS_Compounds_18 %>% 
+  group_by(PFAS_name) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(PFAS_name, -n), y=n)) + 
+  geom_bar(stat="identity") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))  +
+  coord_flip()+ 
+  theme_minimal() + 
+  labs(y="Count", x = "PFAS compounds", fill = "PFAS_name")
+
+pfas_bar
+
+###
+#Now create bar plot that shows length of C
+
+PFAS_Compounds_19 <- left_join(PFAS_Compounds_18, PFAS_C_length)
+
+PFAS_Compounds_20 <- PFAS_Compounds_19 %>% 
+  group_by(PFAS_name) %>%
+  summarise(n = n())
+
+PFAS_Compounds_21 <- PFAS_Compounds_20 %>% left_join(PFAS_C_length)
+
+PFAS_Compounds_23 <- 
+  ggplot(data = PFAS_Compounds_21,
+         aes(x=reorder(PFAS_name, -n),
+             y=n,
+             fill = C_length)) + 
+  geom_bar(stat = "identity") + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) + labs(y="Count", x = "PFAS Compounds") + theme_minimal() + coord_flip()
+
+PFAS_Compounds_23
+
+#ggsave("PFAS_Compounds.jpg", plot = PFAS_Compounds_23, device = 'jpg', width = 168, #height = 100, units = "mm",
+#      dpi = 300, limitsize = TRUE)
+
+#Filter out PFAS < 3, there is just not enough space
+
+dim(PFAS_Compounds_21)
+#30  5
+
+PFAS_Compounds_21_short <- PFAS_Compounds_21 %>% filter (n > 15)
+dim(PFAS_Compounds_21_short)
+#24  5
+
+PFAS_Compounds_long_short <- 
+  ggplot(data = PFAS_Compounds_21_short,
+         aes(x=reorder(PFAS_name, -n),
+             y=n,
+             fill = Chain_length)) + 
+  geom_bar(stat = "identity") + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) + labs(y="Count", x = "PFAS compounds", fill = 'Carbon chain length') + theme_minimal() + coord_flip()+
+  theme(legend.position = "top")
+
+PFAS_Compounds_long_short
+
+#ggsave("PFAS_Compounds_long_short.jpg", plot = PFAS_Compounds_long_short, device = 'jpg', width = 168, height = 100, units = "mm",
+#    dpi = 300, limitsize = T)
+
+##########
+  ggplot(data = PFAS_Compounds_21,
+         aes(x=reorder(PFAS_name, -n),
+             y=n,
+             fill = New_generation)) + 
+  geom_bar(stat = "identity") + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) + labs(y="Count", x = "PFAS Compounds") + theme_minimal() + coord_flip()
+##########
+  
+###
+#Scatterplot, x-axis: C-length, y-axis count
+
+ggplot(PFAS_Compounds_21, aes(x=C_length, y=n, color = Chain_length)) + 
+  geom_point() + 
+  theme_minimal() +
+  labs(x="Length of carbon chain", y = "Count") +
+  theme(legend.position = "top")
+
+
+ggplot(PFAS_Compounds_21, aes(x=C_length, y=n, color = New_generation)) + 
+  geom_point() + 
+  theme_minimal() +
+  labs(x="Length of carbon chain", y = "Count") +
+  theme(legend.position = "top")
+
+
+#With PFAS names
+PFAS_Compounds_scatter_plot <- ggplot(PFAS_Compounds_22, aes(x=C_length, y=n)) + 
+  geom_point() + 
+  theme_minimal()+ 
+  geom_text(label= PFAS_Compounds_22$PFAS_name) +
+  labs(x="Length of carbon chain", y = "Count")
+
+#ggsave("PFAS_Compounds_scatter_plot.jpg", plot = PFAS_Compounds_scatter_plot, device #= 'jpg', width = 168, height = 100, units = "mm",
+#      dpi = 300, limitsize = TRUE)
+
+```
+
+###Species counts
+```{r pressure, echo=FALSE}
+
+#Bar plot with all species
+species_bar <- Species_distinct_2 %>% 
+  group_by(Scientific_name) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Scientific_name, -n), y=n)) + 
+    geom_bar(stat="identity") + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip()
+species_bar
+
+#Only include species that occur in at least 8 papers
+dim(Species_distinct_2)
+#2357    3
+
+Species_distinct_8 <- Species_distinct_2[Species_distinct_2$Scientific_name %in% names(which(table(Species_distinct_2$Scientific_name) > 8)), ]
+dim(Species_distinct_8)
+#576   3
+
+Species_distinct_10 <- Species_distinct_2[Species_distinct_2$Scientific_name %in% names(which(table(Species_distinct_2$Scientific_name) > 10)), ]
+dim(Species_distinct_10)
+#505   3
+
+species_bar <- Species_distinct_10 %>% 
+  group_by(Scientific_name) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Scientific_name, -n), y=n, fill=(Scientific_name))) + theme_minimal() + geom_bar(stat="identity", colour="gray", fill="black") +     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Scientific Name")  +
+  coord_flip()+ 
+  theme_minimal() + 
+  labs(y="Count", x = "Scientific name", fill = "Scientific_name")
+
+species_bar
+
+
+###Create same figure with fill=class
+
+Species_traits_10 <- Species_traits[Species_traits$Scientific_name %in% names(which(table(Species_traits$Scientific_name) > 10)), ]
+dim(Species_traits_10)
+#506   13
+
+Higher_taxon <- Species_traits_10[,c(2,4)]
+
+species_bar <- Species_traits_10 %>% 
+  group_by(Scientific_name) %>%
+  summarise(n = n()) 
+
+Higher_taxon_2 <- Higher_taxon %>% distinct(Scientific_name)
+dim(Higher_taxon_2)
+
+species_bar_2 <- left_join(species_bar, Higher_taxon)
+
+species_bar_3 <- species_bar_2 %>% distinct(Scientific_name, Species_higher_taxon, n)
+
+species_bar_4 <- species_bar_3 %>% ggplot(aes(x=reorder(Scientific_name, -n), y=n, fill = Species_higher_taxon)) + theme_minimal() + geom_bar(stat="identity", colour="gray", group = 'Species_higher_taxon') +  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Scientific species name", fill = "Class")  +
+  coord_flip() + 
+  theme_minimal() +
+  theme(legend.position = "top")+
+  scale_fill_manual(values=c("blue", "red","yellow", "green"))  +
+  theme(legend.position = "top")
+
+#ggsave("species_bar_4.jpg", plot = species_bar_4, device = 'jpg', width = 168, height = 100, units = "mm",
+      dpi = 300, limitsize = TRUE)
+
+
+#Bar plot IUCN status
+IUCN_bar <- Species_traits %>% 
+  group_by(redlistCategory) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(redlistCategory, -n), y=n)) + 
+    geom_bar(stat="identity") + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip() + 
+  theme_minimal() + 
+  labs(y="Count", x = "IUCN Redlist Category")
+
+IUCN_bar
+
+#ggsave("IUCN_bar.jpg", plot = IUCN_bar, device = 'jpg', width = 168, height = 100, units = #"mm", dpi = 300, limitsize = TRUE)
+
+#Bar plot economical relevance
+Economy_bar <- Species_traits %>% 
+  group_by(Economically_relevant) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Economically_relevant, -n), y=n)) + 
+    geom_bar(stat="identity") + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip() + 
+  theme_minimal() + 
+  labs(y="Count", x = "Economically relevant species")
+
+Economy_bar
+
+#ggsave("Economy_bar.jpg", plot = Economy_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+
+#Bar plot Charisma
+Charisma_bar <- Species_traits %>% 
+  group_by(Charismatic_species) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Charismatic_species, -n), y=n)) + 
+    geom_bar(stat="identity") + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip() + 
+  theme_minimal() + 
+  labs(y="Count", x = "Charismatic species")
+
+Charisma_bar
+
+#ggsave("Charisma_bar.jpg", plot = Charisma_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = T)
+
+#Bar plot diet
+dim(Species_traits)
+
+Species_traits_noNA <- na.omit(Species_traits)
+
+Diet_bar <- Species_traits_noNA %>% 
+  group_by(Dietary_class) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Dietary_class, -n), y=n)) + 
+    geom_bar(stat="identity") + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip() + 
+  theme_minimal() + 
+  labs(y="Count", x = "Dietary class")
+
+Diet_bar
+
+#ggsave("Diet_bar.jpg", plot = Diet_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+#Bar plot Body mass
+dim(Species_traits)
+
+Species_traits_noNA <- na.omit(Species_traits)
+
+Species_traits_noNA_weight <- Species_traits_noNA %>% 
+  group_by(Weight) %>%
+  summarise(n = n())
+
+BM_plot <- Species_traits_noNA %>%
+  ggplot(aes(x = Weight, y = n)) + 
+    geom_point(stat="identity") + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  theme_minimal() + 
+  labs(y="Count", x = "Weight") + 
+  expand_limits(x=c(0, 50000))
+
+BM_plot
+
+#ggsave("Diet_bar.jpg", plot = Diet_bar, device = 'jpg', width = 168, height = 100, #units = "mm", dpi = 300, limitsize = TRUE)
+
+
+```
+###Animal group
+```{r pressure, echo=FALSE}
+
+#Turn SpeciesGroups_distinct into long format
+
+SpeciesGroups_long <- 
+
+  SpeciesGroups_distinct %>% pivot_longer(!Study_ID, names_to = 'delete', values_to = 'Species_group')
+
+SpeciesGroups_long_2 <- SpeciesGroups_long[,c(1,3)]
+
+#Delete rows with NA
+SpeciesGroups_long_3 <-na.omit(SpeciesGroups_long_2)
+
+#How many of which species group are there?
+SpeciesGroups_long_3 %>% group_by(Study_ID)
+SpeciesGroups_long_3 %>% group_by(Species_group)
+
+
+table_SpeciesGroups <- SpeciesGroups_long_3 %>%
+  group_by(Species_group) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_SpeciesGroups %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+#How many studies had more than one group of species?
+
+SpeciesGroups_long_3 %>%
+    group_by(Study_ID) %>%
+    dplyr::filter(n() == 1) %>%
+    ungroup()
+
+#---> 468 studies only studied one group!
+
+SpeciesGroups_long_3 %>%
+    group_by(Study_ID) %>%
+    dplyr::filter(n() == 2) %>%
+    ungroup()
+
+#---> 166 studies  studied two group!
+
+SpeciesGroups_long_3 %>%
+    group_by(Study_ID) %>%
+    dplyr::filter(n() == 3) %>%
+    ungroup()
+
+#---> 72 studies  studied three group!
+
+SpeciesGroups_long_3 %>%
+    group_by(Study_ID) %>%
+    dplyr::filter(n() == 4) %>%
+    ungroup()
+
+#---> 20 studies  studied three group!
+
+SpeciesGroups_long_3 %>%
+    group_by(Study_ID) %>%
+    dplyr::filter(n() > 1) %>%
+    ungroup()
+
+#---> 258 studies  studied three group!
+
+#Barplot
+
+SpeciesGroups_long_4 <-
+SpeciesGroups_long_3 %>% 
+  group_by(Species_group) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(Species_group, -n), y=n)) + 
+  geom_bar(stat="identity") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip() + 
+  theme_minimal() + 
+  labs(x="Group of species", y = "Count")
+
+```
+
+###Systematic map
+```{r pressure, echo=FALSE}
+
+#PFAS_Focus
+PFAS_focus_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = PFAS_focus)) + 
+  geom_bar(alpha = 0.7, colour = "black") +  
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "PFAS_focus")  +
+  theme_minimal() + 
+  labs(y="Count", x = "PFAS focus", fill = "PFAS_focus")
+PFAS_focus_bar
+
+#ggsave("PFAS_focus_bar.jpg", plot = PFAS_focus_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+
+###Correlate PFAS_Focus with pub year
+Pub_year <- Bibliometrics_5_distinct[,c(1,4)]
+PFAS_focus <- SystematicMap_6 [,c(1,2)]
+
+PFAS_focus_Pub_year <- left_join (Pub_year, PFAS_focus)
+
+PFAS_focus_Pub_year_2 <- PFAS_focus_Pub_year %>%
+                group_by(Publication_year, PFAS_focus) %>%
+                summarise(n = n())
+
+
+#Scatterplot, x-axis: Pub year, y-axis count
+ggplot(PFAS_focus_Pub_year_2, aes(x= Publication_year, y=n, color = PFAS_focus)) + 
+  geom_point() + 
+  theme_minimal()+ 
+  labs(x="Publication year", y = "Count") + 
+  scale_x_continuous(breaks = c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,2021, 2022))+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+
+#Heatmap
+PFAS_focus_Pub_year_heat <- PFAS_focus_Pub_year_2 %>%
+  ggplot(aes (x = PFAS_focus, y = Publication_year, fill = n)) + 
+  geom_tile()  + 
+  theme_minimal() +  
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ 
+  coord_flip() +
+  scale_fill_gradient (low = "thistle2", high = "deeppink1", na.value = NA) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(), axis.line = element_line(colour = "black")) +
+  labs(x = "PFAS focus", y = "PFAS Publication year")
+PFAS_focus_Pub_year_heat
+
+
+######################
+#PFAS_one_many
+PFAS_one_many_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = PFAS_one_many)) + 
+  geom_bar(alpha = 0.7, colour = "black")  
+PFAS_one_many_bar
+
+#Year_sampling_start
+Year_sampling_start_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = Year_sampling_start)) + 
+  geom_bar(alpha = 0.7, colour = "black")  
+Year_sampling_start_bar
+
+#Year_sampling_end
+Year_sampling_end_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = Year_sampling_end)) + 
+  geom_bar(alpha = 0.7, colour = "black")  
+Year_sampling_end_bar
+
+#Species_one_many
+Species_one_many_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = Species_one_many)) + 
+  geom_bar(alpha = 0.7, colour = "black")  
+Species_one_many_bar
+
+#Habitat
+Habitat_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = Habitat)) + 
+  geom_bar(alpha = 0.7, colour = "black") +
+  theme_minimal() + 
+  labs(y="Count", x = "Habitat types", fill = "Habitat")
+Habitat_bar
+
+Habitat <- SystematicMap_6[, c(1,10)]
+
+Habitat_2 <- Habitat %>% 
+  group_by(Habitat) %>%
+  summarise(n = n())
+
+Habitat_bar <- 
+  ggplot(data = Habitat_2,
+         aes(x=reorder(Habitat, -n),
+             y=n)) + 
+  geom_bar(stat = "identity", colour = "gray") + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Habitat type") + theme_minimal() + coord_flip()
+
+Habitat_bar
+
+#ggsave("Habitat_bar.jpg", plot = Habitat_bar, device = 'jpg', width = 168, height = 100, units = "mm",
+#      dpi = 300, limitsize = TRUE)
+
+#Sex
+Sex_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = Sex)) + 
+  geom_bar(alpha = 0.7, colour = "black")  
+Sex_bar
+
+#Developmental_stage
+Developmental_stage_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = Developmental_stage)) + 
+  geom_bar(alpha = 0.7, colour = "black")  
+Developmental_stage_bar
+
+#Functional_aspects
+Functional_aspects_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = Functional_aspects)) + 
+  geom_bar(alpha = 0.7, colour = "black")  
+Functional_aspects_bar
+
+#Biogeographical_region
+
+Biogeographical_region <- SystematicMap_6[, c(1,18)]
+
+Biogeographical_region_2 <- Biogeographical_region %>% 
+  group_by(Biogeographical_region) %>%
+  summarise(n = n())
+
+region_bar <- 
+  ggplot(data = Biogeographical_region_2,
+         aes(x=reorder(Biogeographical_region, -n),
+             y=n)) + 
+  geom_bar(stat = "identity") + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Biogeographical region") + theme_minimal() + coord_flip()
+region_bar
+
+#ggsave("region_bar.jpg", plot = region_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+#Tissue_one_many
+Tissue_one_many_bar <- SystematicMap_6 %>% 
+  ggplot(aes(x = Tissue_one_many)) + 
+  geom_bar(alpha = 0.7, colour = "black")  
+Tissue_one_many_bar
+
+
+```
+
+###CriticalAppraisal
+```{r pressure, echo=FALSE}
+
+#COI_statement
+table_COI_statement <- CriticalAppraisal_distinct %>%
+  group_by(COI_statement) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_COI_statement %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+COI_statement_bar <- CriticalAppraisal_distinct %>% 
+  ggplot(aes(x = COI_statement)) + 
+  geom_bar(alpha = 0.7, colour = "black")  +  
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "COI Statement")  +
+  theme_minimal()
+
+COI_statement_bar
+
+###Does conflict of Interest statement correlate with pub year?
+
+CriticalAppraisal_distinct_COI <- CriticalAppraisal_distinct[,1:2]
+Pub_Year <- Bibliometrics_5_distinct[,c(1,4)]
+
+#Join CriticalAppraisal_distinct_COI with Pub_Year 
+COI_Pub_Year <- left_join(CriticalAppraisal_distinct_COI, Pub_Year, by = c("Study_ID" = "Study_ID")) %>%
+  group_by(Publication_year, COI_statement) %>%
+  summarise(n = n())
+
+COI_Pub_Year_bar <- ggplot(data=COI_Pub_Year, aes(x=Publication_year, y=n, fill = COI_statement)) +
+  geom_bar(stat="identity")  + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Publication Year", fill = "COI statement present")  +
+  scale_x_continuous(breaks = c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,2021, 2022)) +
+  theme(legend.position = "top")
+
+COI_Pub_Year_bar
+
+#ggsave("COI_Pub_Year_bar.jpg", plot = COI_Pub_Year_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+#####################
+
+#COI_present
+COI_present_bar <- CriticalAppraisal_distinct %>% 
+  ggplot(aes(x = COI_present)) + 
+  geom_bar(alpha = 0.7, colour = "black") 
+
+COI_present_bar
+
+######################
+
+#Funding_statement
+
+#COI_statement
+table_Funding_statement <- CriticalAppraisal_distinct %>%
+  group_by(Funding_statement) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_Funding_statement %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+Funding_statement_bar <- CriticalAppraisal_distinct %>% 
+  ggplot(aes(x = Funding_statement)) + 
+  geom_bar(alpha = 0.7, colour = "black") 
+
+Funding_statement_bar
+
+###Does Funding statement correlate with pub year?
+
+Funding_Yes_No <- CriticalAppraisal_distinct[,c(1,4)]
+
+#Join CriticalAppraisal_distinct_COI with Pub_Year 
+Funding_Pub_Year <- left_join(Funding_Yes_No, Pub_Year, by = c("Study_ID" = "Study_ID")) %>%
+  group_by(Publication_year, Funding_statement) %>%
+  summarise(n = n())
+
+Funding_Pub_Year_bar <- Funding_Pub_Year %>% ggplot(aes(x=Publication_year, y=n, fill = Funding_statement)) +
+  geom_bar(stat="identity")  + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Publication Year", fill = 'Funding statement present')  +
+  scale_x_continuous(breaks = c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,2021, 2022))  +
+  theme(legend.position = "top")
+
+#ggsave("Funding_Pub_Year_bar.jpg", plot = Funding_Pub_Year_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+#####################
+
+#Funding_government
+table_Funding_gov <- CriticalAppraisal_distinct %>%
+  group_by(Funding_government) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_Funding_gov %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+Funding_government_bar <- CriticalAppraisal_distinct %>% 
+  ggplot(aes(x = Funding_government)) + 
+  geom_bar(alpha = 0.7, colour = "black") 
+
+Funding_government_bar
+
+#Funding_NGO
+table_Funding_NGO <- CriticalAppraisal_distinct %>%
+  group_by(Funding_NGO) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_Funding_NGO %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+ Funding_NGO_bar <- CriticalAppraisal_distinct %>% 
+  ggplot(aes(x = Funding_NGO)) + 
+  geom_bar(alpha = 0.7, colour = "black") 
+
+#Funding_industry
+table_Funding_Industry <- CriticalAppraisal_distinct %>%
+  group_by(Funding_industry) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_Funding_Industry %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+ 
+ Funding_industry_bar <- CriticalAppraisal_distinct %>% 
+  ggplot(aes(x = Funding_industry)) + 
+  geom_bar(alpha = 0.7, colour = "black") 
+
+Funding_industry_bar
+
+#######Create non-stacked bar-plot for different funding sources
+
+Funding <- CriticalAppraisal_distinct[,c(1,4:7)]
+
+#Turn Funding into long format
+Funding_long <- 
+  Funding %>% pivot_longer(!c(Study_ID, Funding_statement), names_to = 'Funding', values_to = 'Yes_No')
+
+#Delete Yes_No --> No
+Funding_long_2 <- Funding_long %>% filter (!Yes_No == 'No')
+
+#Join Funding with Pub_Year 
+FundingSource_Pub_Year <- left_join(Funding_long_2, Pub_Year, by = c("Study_ID" = "Study_ID")) %>%
+  group_by(Publication_year, Funding) %>%
+  summarise(n = n())
+
+FundingSource_Pub_Year_bar <- ggplot(data=FundingSource_Pub_Year, aes(x=Publication_year, y=n, fill = Funding)) +
+  geom_bar(stat="identity",position=position_dodge())  + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Publication Year")  +
+  scale_x_continuous(breaks = c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,2021, 2022))  +
+  theme(legend.position = "top")
+
+#ggsave("FundingSource_Pub_Year_bar.jpg", plot = FundingSource_Pub_Year_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+#####################
+
+#Raw_data
+table_Raw_data <- CriticalAppraisal_distinct %>%
+  group_by(Raw_data) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_Raw_data %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+Raw_data_bar <- CriticalAppraisal_distinct %>% 
+  ggplot(aes(x = Raw_data)) + 
+  geom_bar(alpha = 0.7, colour = "black") 
+
+Raw_data_bar
+
+#Join CriticalAppraisal_distinct_COI with Pub_Year 
+Raw_data <- left_join(CriticalAppraisal_distinct, Pub_Year, by = c("Study_ID" = "Study_ID")) %>%
+  group_by(Publication_year, Raw_data) %>%
+  summarise(n = n())
+
+Raw_data_Pub_Year_bar <- ggplot(data=Raw_data, aes(x=Publication_year, y=n, fill = Raw_data)) +
+  geom_bar(stat="identity")  + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Publication Year", fill = 'Raw data present')  +
+  scale_x_continuous(breaks = c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,2021, 2022)) +
+  theme(legend.position = "top")
+
+Raw_data_Pub_Year_bar
+
+#ggsave("Raw_data_Pub_Year_bar.jpg", plot = Raw_data_Pub_Year_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+
+###########################
+#Analysis_code
+table_Analysis_code <- CriticalAppraisal_distinct %>%
+  group_by(Analysis_code) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+table_Analysis_code %>%
+  kbl() %>%
+ kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+Analysis_code_bar <- CriticalAppraisal_distinct %>% 
+  ggplot(aes(x = Analysis_code)) + 
+  geom_bar(alpha = 0.7, colour = "black") 
+
+Analysis_code_bar
+
+```
+
+
+##############
+###More sophisticated plots
+
+### Heatmap PFAS by Habitat
+```{r pressure, echo=FALSE}
+
+#Delete PFAS <3
+PFAS_Compounds_25 <- PFAS_Compounds_18[PFAS_Compounds_18$PFAS_name %in% names(which(table(PFAS_Compounds_18$PFAS_name) > 3)), ]
+
+#Join PFAS_Compounds_19 with 
+PFAS_Compounds_short <- PFAS_Compounds_25[, c(1,2)]
+Habitat <- SystematicMap_6 [,c(1,10)]
+
+PFAS_Habitat <- left_join(PFAS_Compounds_short, Habitat) %>%
+  group_by(PFAS_name, Habitat) %>%
+  summarise(n = n())
+
+pfas_habitat_heat <- PFAS_Habitat %>%
+  ggplot(aes (y = reorder(Habitat, -n),x = reorder(PFAS_name, -n), fill = n)) + 
+  geom_tile()  + 
+  theme_minimal() +  
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ 
+  scale_fill_gradient (low = "thistle2", high = "deeppink1", na.value = NA) +
+  theme() +
+  labs(y="Habitat", x = "PFAS Compounds", fill = 'Count') +
+  theme(legend.position = "top")
+
+pfas_habitat_heat
+
+#ggsave("pfas_habitat_heat.jpg", plot = pfas_habitat_heat, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+```
+
+### Heatmap PFAS by Biogeographical region
+```{r pressure, echo=FALSE}
+
+PFAS_Compounds_27 <- left_join(PFAS_Compounds_25, SystematicMap_6, by = c("Study_ID" = "Study_ID")) %>%
+  group_by(PFAS_name, Biogeographical_region) %>%
+  summarise(n = n())
+
+pfas_biogeographic_heat <- PFAS_Compounds_27 %>%
+  ggplot(aes(y = reorder(Biogeographical_region, -n), x = reorder(PFAS_name, -n), fill = n,)) + 
+  geom_tile() +
+  geom_tile() +
+  theme_minimal() + 
+  scale_fill_gradient(low = "thistle2", high = "deeppink1", na.value = NA) + theme(axis.text.x = element_text(face = 'bold', colour = 'red', size = 12, angle = 45), axis.text.y = element_text(size = 12)) + labs(y="Biogeographical Region", x = "PFAS Compounds", fill = 'Count') + theme_minimal()  +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position = "top")
+
+  pfas_biogeographic_heat
+
+#ggsave("pfas_biogeographic_heat.jpg", plot = pfas_biogeographic_heat, device = 'jpg', width = 168, height = 100, units = "mm",
+#       dpi = 300, limitsize = TRUE)
+```
+
+### PFAS vs. Species Heatmap
+```{r pressure, echo=FALSE}
+
+temp <- full_join(Species_distinct_8, PFAS_Compounds_25) %>%
+  group_by(PFAS_name, Scientific_name) %>%
+  summarise(n = n())
+colSums(is.na(temp))
+
+pfas_species_heat <- full_join(Species_distinct_8, PFAS_Compounds_25) %>%
+  group_by(PFAS_name, Scientific_name) %>%
+  summarise(n = n())
+dim(pfas_species_heat)
+
+pfas_species_heat_2 <- pfas_species_heat %>% filter (!Scientific_name == 'NA')
+dim(pfas_species_heat_2)
+
+pfas_species_heat_3 <- pfas_species_heat_2 %>% filter (!PFAS_name == 'NA')
+dim(pfas_species_heat_3)
+
+pfas_species_heat_4 <- pfas_species_heat_3 %>% ggplot(aes(reorder(Scientific_name, -n), reorder(PFAS_name, -n),  fill = n)) + 
+  geom_tile() + scale_fill_gradient(low = "purple", high = "pink", na.value = NA) + theme_minimal() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="PFAS Names", x = "Scientific species name", fill = 'Count')
+pfas_species_heat_4
+
+#ggsave("pfas_species_heat.jpg", plot = pfas_species_heat_4, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+```
+
+### Line Plot Publication Year - biogeographical regions
+```{r pressure, echo=FALSE}
+
+cnt_year2 <-   
+  cnt_year %>% 
+  mutate(Biogeographical_region = "All regions")
+
+Biogeographical <- SystematicMap_6 %>% 
+  select(Study_ID, Biogeographical_region) %>%
+  distinct() %>% 
+  left_join(Bibliometrics_5_distinct[c("Study_ID", "Publication_year")]) %>% 
+  count(Biogeographical_region, Publication_year) %>% 
+  filter(Biogeographical_region != "Mixed") %>% 
+  bind_rows(cnt_year2) %>% 
+  complete(Publication_year, Biogeographical_region, fill = list(n = 0)) %>% 
+  mutate(Biogeographical_region = factor(Biogeographical_region,
+                                         levels = c("All regions", 
+                                                    "Tropical",
+                                                    "Temperate",
+                                                    "Subtropical", 
+                                                    "Polar")))
+
+Biogeographical
+
+pub_year_geograph_line <-
+
+Biogeographical %>% 
+  ggplot(aes(x = Publication_year, 
+             y = n,
+             col = Biogeographical_region)) +
+  geom_line(aes(size = Biogeographical_region)) + 
+  geom_point() +
+  scale_color_manual(values = c("black", "red", "yellow", "green", "blue")) +
+  scale_size_manual(values = c(2, rep(1, 4))) +
+  theme_minimal() +
+  theme(legend.position = "top") +
+  labs(y = "PFAS-related Literature", 
+       x = "Publication Year",
+       color = 'Biogeographical region',
+       size = 'Biogeographical region')
+
+pub_year_geograph_line
+
+#ggsave("pub_year_geograph_line.jpg", plot = pub_year_geograph_line, device = 'jpg', width = 168, height = 100, units = "mm",
+#       dpi = 300, limitsize = TRUE)
+
+```
+### Heatmap biogeographical regions by Publication year
+```{r pressure, echo=FALSE}
+
+PFAS_Compounds_30 <- left_join(SystematicMap_6, Bibliometrics_5_distinct, by = c("Study_ID" = "Study_ID")) %>%
+  group_by(Publication_year, Biogeographical_region) %>%
+  summarise(n = n())
+
+BioRegion_PublicationYear_heat <- PFAS_Compounds_30 %>%
+  ggplot(aes(reorder(Biogeographical_region, -n), Publication_year, fill = n,)) + 
+  geom_tile() +
+  scale_fill_gradient(low = "thistle2", high = "deeppink1", na.value = NA) + theme(axis.text.x = element_text(face = 'bold', colour = 'red', size = 12, angle = 45), axis.text.y = element_text(size = 12)) + geom_tile(color = "white",lwd = 1.5,linetype = 1)+ 
+labs(y="Publication year", x = "Biogeographical region", fill = 'Count') + coord_flip()+ theme_minimal()+
+  theme(legend.position = "top")
+
+BioRegion_PublicationYear_heat
+
+
+#ggsave("BioRegion_PublicationYear_heat.jpg", plot = BioRegion_PublicationYear_heat, device = 'jpg', width = 168, height = 100, units = "mm",
+#       dpi = 300, limitsize = TRUE)
+
+```
+
+
+### Heatmap PFAS by Publicaion year
+```{r pressure, echo=FALSE}
+
+PFAS_Compounds_28 <- left_join(PFAS_Compounds_25, Bibliometrics_5_distinct, by = c("Study_ID" = "Study_ID")) %>%
+  group_by(PFAS_name, Publication_year) %>%
+  summarise(n = n())
+
+pfas_PublicationYear_heat <- PFAS_Compounds_28 %>%
+  ggplot(aes(reorder(PFAS_name, -n), Publication_year, fill = n,)) + 
+  geom_tile() +
+  scale_fill_gradient(low = "thistle2", high = "deeppink1", na.value = NA) + theme(axis.text.x = element_text(face = 'bold', colour = 'red', size = 12, angle = 45), axis.text.y = element_text(size = 12)) + labs(y="Publication year", x = "PFAS Compounds", fill = 'Count') + theme_minimal() + coord_flip() +
+  theme(legend.position = "top")
+pfas_PublicationYear_heat
+
+#ggsave("pfas_PublicationYear_heat.jpg", plot = pfas_PublicationYear_heat, device = 'jpg', width = 168, height = 100, units = "mm",
+#      dpi = 300, limitsize = TRUE)
+```
+
+
+### Heatmap Sex by class
+```{r pressure, echo=FALSE}
+
+Sex <- SystematicMap_6[,c(1,12)]
+Class <- Species_traits[, c(1,4)]
+
+Class_Sex <- left_join(Class, Sex, by = c("Study_ID" = "Study_ID")) %>%
+  group_by(Sex, Species_higher_taxon) %>%
+  summarise(n = n())
+
+Class_Sex_heat <- 
+  
+  Class_Sex %>%
+  ggplot(aes(reorder(Sex, -n), reorder(Species_higher_taxon, -n), fill = n,)) + 
+  geom_tile() + 
+  theme_minimal() +
+  scale_fill_gradient(low = "thistle2", high = "deeppink1", na.value = NA) + theme(axis.text.x = element_text(colour = 'black', size = 12, angle = 90), axis.text.y = element_text(size = 12)) + 
+  labs(y="Class", x = "Sex", fill = 'Count') + 
+  coord_flip() +
+  theme(legend.position = "top")
+
+Class_Sex_heat
+
+#ggsave("Class_Sex_heat.jpg", plot = Class_Sex_heat, device = 'jpg', width = 168, height = 100, units = "mm",
+#       dpi = 300, limitsize = TRUE)
+```
+
+### Heatmap developmental stage by class
+```{r pressure, echo=FALSE}
+
+Development <- SystematicMap_6[,c(1,14)]
+
+Class_Development <- left_join(Class, Development, by = c("Study_ID" = "Study_ID")) %>%
+  group_by(Developmental_stage, Species_higher_taxon) %>%
+  summarise(n = n())
+
+#data_new <- Class_Development %>% 
+#  replace(Developmental_stage == 'Eggs/early development', 'Eggs')
+
+Class_Development_heat <- 
+  
+  Class_Development %>%
+  ggplot(aes(reorder(Developmental_stage, -n), reorder(Species_higher_taxon, -n), fill = n,)) + 
+  geom_tile() + 
+  theme_minimal() +
+  scale_fill_gradient(low = "thistle2", high = "deeppink1", na.value = NA) + theme(axis.text.x = element_text(colour = 'black', size = 12, angle = 90), axis.text.y = element_text(size = 12)) + labs(y="Class", x = "Developmental stage", fill = 'Count') + coord_flip()+
+  theme(legend.position = "top")
+
+Class_Development_heat
+
+#ggsave("Class_Development_heat.jpg", plot = Class_Development_heat, device = 'jpg', width = 168, height = 100, units = "mm",
+#       dpi = 300, limitsize = TRUE)
+```
+
+
+### author by country map
+```{r pressure, echo=FALSE}
+
+# ingest data
+count_country <- Bibliometrics_5_distinct %>%
+  count(Country_FirstAuthor)
+
+#Prepare dataframe count_country
+colnames(count_country) <- c('region', 'Country_FirstAuthor')
+
+world_map <- map_data("world")
+
+#Combine count_country_2 & world_map
+first_author.map <- full_join(count_country, world_map, by = "region")
+
+first_author.map_2 <- first_author.map
+
+#Convert NA into 0
+first_author.map_2[is.na(first_author.map_2)] <- 0
+
+names(first_author.map_2)
+
+names(first_author.map_2) <- c("region", "Published_papers_first_author_affiliation", "long", "lat", "group", "order",  "subregion")
+
+first_author.map_3 <- ggplot(first_author.map_2, aes(long, lat, group = group))+
+  geom_polygon(aes(fill = Published_papers_first_author_affiliation ), color = "white")+
+  scale_fill_viridis_c(option = "C")+ 
+  theme_minimal()+
+  theme(legend.position = "top") + 
+  labs(y="latitude", x = "longitude", fill= 'Number of papers of first authors in countries')
+
+first_author.map_3
+
+#ggsave("first_author.map.jpg", plot = first_author.map_3, device = 'jpg', width = 150, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+```
+
+
+## Sankey plot (first author - sampling site)
+```{r pressure, echo=FALSE}
+
+#Merge dataframes
+
+sankey_author <-
+  Country_Region_distinct_3 %>%
+  select(c(1, 2)) %>% 
+  left_join(Bibliometrics_5_distinct, by = "Study_ID") %>% 
+  select(source_author = Country_FirstAuthor,
+         target_sample = Country_Region_Sample_Collection) %>% 
+  count(source_author, target_sample) %>% 
+  mutate(target_sample = paste(target_sample, " ", sep = ""))
+
+#View(sankey_author)
+
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes <- data.frame(
+  name=c(as.character(sankey_author$source_author), 
+         as.character(sankey_author$target_sample)) %>% unique()
+)
+
+nodes
+
+# With networkD3, connection must be provided using id, not using real name like in the links dataframe. So we need to reformat it.
+sankey_author$IDsource <- match(sankey_author$source_author, nodes$name)-1 
+sankey_author$IDtarget <- match(sankey_author$target_sample, nodes$name)-1
+
+#Make the Network
+sankeyNetwork_plot <- sankeyNetwork(Links = sankey_author, Nodes = nodes,
+                   Source = "IDsource", Target = "IDtarget", Value = "n", NodeID = "name", 
+                   sinksRight=FALSE)
+                   
+sankeyNetwork_plot
+
+#Save figure
+
+# save it as an html
+saveNetwork(sankeyNetwork_plot, "sankeyNetwork_plot.html")
+
+# you convert it as png
+webshot("sankeyNetwork_plot.html","sankeyNetwork_plot.png", width = 1000, vheight = 900)
+
+# Swap around target and source
+sankey_author$IDsource <- match(sankey_author$source_author, nodes$name)-1 
+sankey_author$IDtarget <- match(sankey_author$target_sample, nodes$name)-1
+
+#Make the Network
+sankeyNetwork_plot_2 <- sankeyNetwork(Links = sankey_author, Nodes = nodes,
+                   Source = "IDtarget", Target = "IDsource", Value = "n", NodeID = "name", 
+                   sinksRight=FALSE)
+                   
+sankeyNetwork_plot_2
+
+#Save figure
+
+# save it as an html
+saveNetwork(sankeyNetwork_plot_2, "sankeyNetwork_plot_2.html")
+
+# you convert it as png
+webshot("sankeyNetwork_plot_2.html","sankeyNetwork_plot_2.png")
+
+#######################
+###Experiment with less countries/ sampling locations
+
+length(unique(Country_Region_distinct_3$Country_Region_Sample_Collection))
+#27
+
+#Delete sampling locations < 5
+Country_Region_red5 <- 
+  Country_Region_distinct_3 %>% 
+  group_by(Country_Region_Sample_Collection) %>%
+  summarise(n = n())
+
+Country_Region_red5_2 <- Country_Region_red5 %>% filter(!n < 7)
+length(unique(Country_Region_red5_2$Country_Region_Sample_Collection))
+#25
+
+###--> Doesn't seem to be that relevant! Already all deleted that were < 3
+
+```
+
+
