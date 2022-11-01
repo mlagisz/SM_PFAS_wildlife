@@ -28,6 +28,8 @@ library(webshot)
 ```{r pressure, echo=FALSE}
 setwd("Z:/Ideel-Lab_2/PFAS_projects/SystMap_PFASconcWildlife/Data_Analysis")
 
+setwd("C:/Work/Github_SM_PFAS_wildlife/data")
+
 ```
 
 #Import csv files
@@ -2138,4 +2140,106 @@ length(unique(Country_Region_red5_2$Country_Region_Sample_Collection))
 
 ```
 
+#Bubble plots
+
+#Habitat vs. classes
+```{r}
+Habitat_bar <- 
+  ggplot(data = Habitat_2,
+         aes(x=reorder(Habitat, -n),
+             y=n)) + 
+  geom_bar(stat = "identity", colour = "gray") + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Habitat type") + theme_minimal() + coord_flip()
+Habitat_bar
+
+Habitat <- SystematicMap_6[, c(1,10)]
+
+Habitat_2 <- Habitat %>% 
+  group_by(Habitat) %>%
+  summarise(n = n())
+
+#Join Habitat and Habitat_2
+Habitat_3 <- Habitat %>% left_join(Habitat_2)
+
+Species_short <- Species_distinct_2 [,c(1,2,4)]
+dim(Species_short)
+
+#Join Species_short and Habitat_3
+Habitat_Species <- Species_short %>% left_join(Habitat)
+
+Species_higher_taxon_count <- Habitat_Species %>% 
+  group_by(Species_higher_taxon) %>%
+  summarise(n = n())
+
+Species_higher_taxon_ranking <- Habitat_Species %>%
+  group_by(Species_higher_taxon) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+Species_higher_taxon_ranking %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+Habitat_Species_count <- Habitat_Species %>% 
+  group_by(Habitat,Species_higher_taxon) %>%
+  summarise(n = n())
+
+Habitat_Species_bubble <- ggplot(Habitat_Species_count, aes(x= reorder(Habitat, -n), y = reorder(Species_higher_taxon, -n), size = n)) +
+    geom_point(alpha=0.7) + theme_minimal() +
+  labs(y="Classes", x = "Habitat") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+#ggsave("Habitat_Species_bubble.jpg", plot = Habitat_Species_bubble, device = 'jpg', width = 150, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+##########
+
+Habitat_ranking <- Habitat_Species %>%
+  group_by(Habitat) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+Species_higher_taxon_ranking <- Habitat_Species %>%
+  group_by(Species_higher_taxon) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+#############
+```
+
+#Biogeographical region vs. classes
+```{r}
+
+Region_ranking <- SystematicMap_6 %>%
+  group_by(Biogeographical_region) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  arrange(desc(n_studies))
+
+#########
+
+Region <- SystematicMap_6[, c(1,18)]
+
+#Join Species_short and Habitat_3
+Region_Species <- Species_short %>% left_join(Region)
+
+Region_Species_count <- Region_Species %>% 
+  group_by(Biogeographical_region, Species_higher_taxon) %>%
+  summarise(n = n())
+
+Region_Species_bubble <- ggplot(Region_Species_count, aes(x= reorder(Biogeographical_region, -n), y = reorder(Species_higher_taxon, -n), size = n)) +
+    geom_point(alpha=0.7) + theme_minimal() +
+  labs(y="Classes", x = "Biogeographical region") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+#ggsave("Region_Species_bubble.jpg", plot = Region_Species_bubble, device = 'jpg', width = 150, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+```
+
+
+
+
+
+
+
+
+
+```
 
