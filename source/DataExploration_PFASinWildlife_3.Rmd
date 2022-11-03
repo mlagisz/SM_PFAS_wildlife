@@ -2184,10 +2184,13 @@ Habitat_Species_count <- Habitat_Species %>%
   group_by(Habitat,Species_higher_taxon) %>%
   summarise(n = n())
 
-Habitat_Species_bubble <- ggplot(Habitat_Species_count, aes(x= reorder(Habitat, -n), y = reorder(Species_higher_taxon, -n), size = n)) +
+Habitat_Species_bubble <- 
+  
+ggplot(Habitat_Species_count, aes(x= reorder(Habitat, -n), y = reorder(Species_higher_taxon, -n), size = n)) +
     geom_point(alpha=0.7) + theme_minimal() +
   labs(y="Classes", x = "Habitat") + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_fill_discrete(name= 'Count')
 
 #ggsave("Habitat_Species_bubble.jpg", plot = Habitat_Species_bubble, device = 'jpg', width = 150, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 
@@ -2234,6 +2237,15 @@ Region_Species_bubble <- ggplot(Region_Species_count, aes(x= reorder(Biogeograph
 ```
 
 
+#Violine plot: 
+```{r}
+
+
+ggplot(Sampling_Period_Class_no_NA_SHORT, aes(x=Species_higher_taxon, y=Sampling_Period)) + 
+  geom_violin()
+
+
+```
 
 
 
