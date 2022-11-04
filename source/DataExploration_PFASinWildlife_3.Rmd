@@ -6,20 +6,33 @@ output: html_document
 #Load packages
 ```{r pressure, echo=FALSE}
 
-library(googlesheets4)
-library(tidyverse)
-library(ggplot2)
-library(kableExtra)
-library("stringr")
-library(leaflet)  # for plotting maps
-library(maps)     # for plotting maps
-library(magrittr)
-library(plotly)
-library(htmlwidgets)
-library(janitor)
-library(stringr)
-library(networkD3)
+
 library(dplyr)
+
+library(ggplot2)
+
+library(googlesheets4)
+
+library(htmlwidgets)
+
+library(janitor)
+
+library(kableExtra)
+
+library(leaflet)
+
+library(networkD3)
+
+library(magrittr)
+
+library(maps) 
+
+library(plotly)
+
+library(stringr)
+
+library(tidyverse)
+
 library(webshot)
 
 ```
