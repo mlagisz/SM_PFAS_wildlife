@@ -1,0 +1,647 @@
+---
+title: "Bibliometrics_PFASWildlife"
+author: ML
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+## Publishedcprotocol:   
+(Vendl et al. 2022; Profiling research on PFAS in wildlife: Protocol of a systematic evidence map and bibliometric analysis; DOI: 10.1002/2688-8319.12106)
+
+### AIMS (from the protocol):   
+"Bibliometrics: How interdisciplinary, connected and diversely rep- resented across institutions and countries are the papers in the research field?  
+We will perform a bibliometric analysis to gain an understanding of the interdisciplinarity, connectedness and citation rate of the studies on PFAS in wildlife. For this purpose, we will use the following data: publication time and place, co-authorships, country affiliations, word frequencies and number of citations and papers cited, for all articles indexed in the Scopus database. The data on co-authorships will pro- vide an overview of the level of collaborations between authors, institutions and countries. Word frequencies will show the range of disciplines involved and the clustering of concepts in the research field. The number of citations will give an idea about the impact the individual studies have on the research field and how this impact is distributed."
+
+### METHODS (from the protocol):  
+"Bibliometrics: How interdisciplinary, connected and well-cited are the papers in the research field?
+We will visualize the extracted bibliometric data as tables (e.g. top-cited publications and top-producing authors), plots (e.g. counts by year of publication) and colour-coded maps (e.g. country of affiliated institution of first author). Furthermore, we will plot networks of co-authorships, institutions and countries. These data will be automatically extracted from Scopus bibliometrics records of the included studies for which full Scopus records exist. We will process these bibliometric records and perform network analyses using R packages such as bibliometrix (Aria & Cuccurullo, 2017) and igraph R packages (Csardi & Nepusz, 2006) and other relevant stand-alone software packages."
+
+publication time and place
+co-authorships (network): author, institution, countries
+country affiliations
+word frequencies: title/abstract
+number of citations and papers cited
+
+
+## Load packages
+```{r setup, echo=FALSE}
+library(here)
+library(tidyverse)
+library(kableExtra)
+library(bibliometrix)
+library(circlize)
+library(ggrepel)
+```
+
+## Import csv files with manually extracted bibliometrics data 
+
+```{r load csv, echo=FALSE}
+dat <- read.csv(here("data", "PFASinWildlife_Bibliometrics.csv"))
+str(dat)
+
+# Country_Region <- read.csv("PFASinWildlife_Country_Region.csv")
+# PFAS_Compounds <- read.csv("PFASinWildlife_PFAS_Compounds.csv")
+# Species <- read.csv("Species_clean_Losia.csv")
+# PFAS_C_length <- read.csv("PFAS_C_length_2.csv")
+# SystematicMap <- read.csv("PFASinWildlife_SystematicMap.csv")
+# CriticalAppraisal <- read.csv ('PFASinWildlife_CriticalAppraisal.csv')
+# SpeciesGroups <- read.csv ('PFASinWildlife_SpeciesGroups.csv')
+# Species_traits <- read.csv("Species_clean_all_traits_Losia.csv")
+```
+
+
+## Summarise manually extracted bibliometrics data 
+
+```{r summarise manual csv, echo=FALSE}
+
+#View(dat)
+#dim(dat)
+# table(dat$Publication_year)
+# table(dat$Country_FirstAuthor)
+# table(dat$Comment) #27 are excluded
+# table(dat$Checked) #3 + 1 are excluded
+
+#Delete rows with excluded papers
+dat <- dat %>% 
+  filter(!Comment == 'Excluded') %>% 
+  filter(!Checked == 'Excluded') %>% 
+  filter(!Study_ID == '')
+dim(dat) #581
+
+###Check content of columns (upper/lower case etc.)
+# dat %>% distinct(Study_ID)
+# dat %>% distinct(Author_year)
+# dat %>% distinct(Paper_title)
+# dat %>% distinct(Publication_year)
+# dat %>% distinct(Country_FirstAuthor)
+# dat %>% count(Country_FirstAuthor)
+# dat %>% count(Author_year)
+
+#n_occur_biblio <- data.frame(table(dat$Study_ID))
+#594
+
+#n_occur_author <- data.frame(table(dat$Author_year)) #some combinations of Author_year appear multiple times (for different papers), e.g.  dat[dat$Author_year == "Taylor_2019", "Paper_title"]
+#dim(dat)#581   7
+
+# datd <- dat %>% distinct(Study_ID, Author_year, .keep_all = TRUE)
+# dim(datd)
+# #581   7
+
+#make table of counts of manually coded countries of first authors - selected top 10:
+table_Country_first_author <- dat %>%
+  group_by(Country_FirstAuthor) %>%
+  summarize(n_studies = n_distinct(Study_ID)) %>%
+  top_n(10) %>%
+  arrange(desc(n_studies))
+
+#display styled table
+table_Country_first_author %>%
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+```
+
+
+## Load bibliometric data from Scopus full records
+
+Data for 572 document results of a search query containing all DOI and a few titles, run on 1 November 2022 using Scopus advanced search.
+
+```{r load Scopus bib, echo=FALSE}
+
+#Bibliometric data of included papers (with references) dwonloaded from Scopus in .bib format:
+bib_sco <- convert2df(here("data","scopus.bib"), 
+                      dbsource = "scopus", 
+                      format = "bibtex")
+dim(bib_sco) #572 rows 37 columns
+
+names(bib_sco)
+#head(bib_sco)
+bib_sco$longID <- rownames(bib_sco) #add column with long paper ID made from rownames
+```
+
+
+### Top journals
+
+```{r top journals counts, echo=FALSE}
+
+#plot top 20 journals with most article counts
+count(bib_sco, JI) %>%
+  arrange(n) %>%
+  top_n(20) %>% 
+  mutate(class = factor(JI, levels = JI)) %>%
+  ggplot(aes(x = class, y = n)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::comma(n)), hjust = 0, nudge_y = 1) +
+  coord_flip() +
+  scale_y_continuous(breaks=seq(0,400,50)) +
+  labs(x = "", y = "Article count", title = "Top 20 journals") + 
+  theme_minimal()
+
+ggsave(filename = here("plots", "Figure_top20journals.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Top chemicals
+
+```{r top chemicals_cas counts, echo=FALSE}
+
+Chemicals_cas <- bib_sco %>% select(chemicals_cas, PY, longID) %>% separate_rows(chemicals_cas, sep = "; ") %>% separate_rows(chemicals_cas, sep = ", ") #split rows with multiple values
+
+count(Chemicals_cas, chemicals_cas) %>%
+  arrange(n) %>%
+  filter(!is.na(chemicals_cas)) %>%
+  top_n(20) %>% 
+  mutate(class = factor(chemicals_cas, levels = chemicals_cas)) %>%
+  ggplot(aes(x = class, y = n)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::comma(n)), hjust = 0, nudge_y = 1) +
+  coord_flip() +
+  scale_y_continuous(breaks=seq(0,400,50)) +
+  labs(x = "", y = "Article count", title = "Top 20 chemicals names / CAS") + 
+  theme_minimal()
+
+ggsave(filename = here("plots", "Figure_top20chemicals.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Top keywords
+
+```{r top keywords counts, echo=FALSE}
+
+Keywords <- bib_sco %>% select(ID, PY, longID) %>% separate_rows(ID, sep = ";  ") %>% separate_rows(ID, sep = "; ") #split rows with multiple values
+
+count(Keywords, ID) %>%
+  arrange(n) %>%
+  filter(!is.na(ID)) %>%
+  top_n(20) %>% 
+  mutate(class = factor(ID, levels = ID)) %>%
+  ggplot(aes(x = class, y = n)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::comma(n)), hjust = 0, nudge_y = 1) +
+  coord_flip() +
+  scale_y_continuous(breaks=seq(0,400,50)) +
+  labs(x = "", y = "Article count", title = "Top 20 keywords") + 
+  theme_minimal()
+
+ggsave(filename = here("plots", "Figure_top20keywords.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Citations of papers
+
+```{r citations years scatterplot, echo=FALSE}
+
+#rownames(bib_sco[bib_sco$TC > 250, ]) #papers with >250 citations
+highlycited <- bib_sco %>% filter(TC > 250)
+#dim(highlycited) #10 papers
+
+#scatterplot with labels for most highly cited papers, using ggrepel 
+ggplot(bib_sco, aes(x = PY, y = TC, size = 1, alpha = 0.1)) + 
+  geom_point(col = "grey") +
+  theme_minimal() +
+  theme(legend.position = "none") + 
+  guides(colour = "none", alpha = "none", scale = "none") + #guides(size = guide_legend("Journal Impact Factor")) + 
+  labs(x = "Publication Year", y = "Total Citations per paper") + #title = "Impact", caption = "Source: Scopus"
+  geom_label_repel(aes(label = longID), size = 2, data = highlycited, max.overlaps = 100, force_pull = 2, force = 2, nudge_x = 10, nudge_y = 700) 
+
+ggsave(filename = here("plots", "Figure_year_totalcitations.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Number of cited papers (references)
+
+```{r references years scatterplot, echo=FALSE}
+
+# #make a new table with counts of cited papers 
+# Cited <- separate_rows(bib_sco, CR, sep = "; ") %>%
+#   group_by(longID) %>%
+#   summarise(count = n_distinct(CR))
+# 
+# #extract Year from long ID
+# Cited$year <- as.numeric(gsub(".*?([0-9]+).*", "\\1", Cited$longID))             
+
+bib_sco$Refs_count <- str_count(bib_sco$CR, pattern = ";") + 1 #count symbols that separate authors
+
+#scatterplot with labels for most highly cited papers, using ggrepel 
+bib_sco %>% 
+  filter(!is.na(Refs_count)) %>%
+  ggplot(aes(x = PY, y = Refs_count, size = 1, alpha = 0.1)) + 
+  geom_point(col = "grey") +
+  theme_minimal() +
+  theme(legend.position = "none") + 
+  guides(colour = "none", alpha = "none", scale = "none") + #guides(size = guide_legend("text")) + 
+  labs(x = "Publication Year", y = "Total references per paper") #+ title = "References", caption = "Source: Scopus"
+
+ggsave(filename = here("plots", "Figure_year_references.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Top authors
+Most productive authors in terms of numbers of publications
+(names not disambiguated)
+
+```{r top authors, echo=FALSE}
+
+Authors <- bib_sco %>% select(AU, PY, longID) %>% separate_rows(AU, sep = ";") #split rows with multiple values
+
+count(Authors, AU) %>%
+  arrange(n) %>%
+  filter(!is.na(AU)) %>%
+  top_n(20) %>% 
+  mutate(class = factor(AU, levels = AU)) %>%
+  ggplot(aes(x = class, y = n)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::comma(n)), hjust = 0, nudge_y = 1) +
+  coord_flip() +
+  scale_y_continuous(breaks=seq(0,50,10)) +
+  labs(x = "", y = "Article count", title = "Top 20 authors") + 
+  theme_minimal()
+
+ggsave(filename = here("plots", "Figure_top20authors.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Number of authors per paper
+
+```{r authors years scatterplot, echo=FALSE}
+#make a new table with counts of cited papers 
+  #Authors <- separate_rows(bib_sco, AU, sep = ";") %>%
+  #group_by(longID) %>%
+  #summarise(count = n_distinct(AU))
+  #Authors$year <- as.numeric(gsub(".*?([0-9]+).*", "\\1", Authors$longID))    #extract Year from long ID         
+
+bib_sco$Authors_count <- str_count(bib_sco$AU, pattern = ";") + 1 #count symbols that separate authors
+
+#scatterplot with labels for most highly cited papers, using ggrepel 
+bib_sco %>% ggplot(aes(x = PY, y = Authors_count, size = 1, alpha = 0.1)) + 
+  geom_point(col = "grey") +
+  theme_minimal() +
+  theme(legend.position = "none") + 
+  guides(colour = "none", alpha = "none", scale = "none") + #guides(size = guide_legend("text")) + 
+  labs(x = "Publication Year", y = "Number of authors per paper") #+ title = "Authors", caption = "Source: Scopus"
+
+ggsave(filename = here("plots", "Figure_year_authors.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Collaborations network - by co-authors affiliation countries
+
+```{r co-authorship countries, echo=FALSE}
+#extract country information from author affiliations
+bib2 <- metaTagExtraction(bib_sco, Field = "AU1_CO", sep = ";") #extract country of first co-author
+bib2 <- metaTagExtraction(bib2, Field = "AU_CO", sep = ";") #extract country of all co-authors
+#names(bib2)
+#bib2$AU_CO
+
+#co-authorship collaboration based on affiliation countries
+NetMatrix2 <- biblioNetwork(bib2, 
+                            analysis = "collaboration",
+                            network = "countries", 
+                            sep = ";")
+net_matrix2 <- as.matrix(NetMatrix2)
+#net_matrix2 <- net_matrix2[rownames(NetMatrix2), countries]
+
+diag(net_matrix2) <- 0 #get rid of collaboration with same country
+#net_matrix2
+
+# getting rid of lower triangle (as this is duplication of info)
+net_matrix2[lower.tri(net_matrix2)] <- 0 
+#colnames(net_matrix2) - change to title case:
+colnames(net_matrix2) <- str_to_title(colnames(net_matrix2))
+#rownames(net_matrix2) - change to title case:
+rownames(net_matrix2) <- str_to_title(rownames(net_matrix2))
+#Fix abbreviated country names :
+colnames(net_matrix2)[colnames(net_matrix2) == "Usa"] <- "USA"
+rownames(net_matrix2)[rownames(net_matrix2) == "Usa"] <- "USA"
+
+my.cols2 <- c(USA = "#00FFFF",
+              China = "#89CFF0",
+              Spain = "#7393B3", 
+              Denmark = "#088F8F", 
+              Italy = "#9FE2BF",
+              France = "#EADDCA",
+              Sweden = "#E1C16E",
+              Canada = "#CD7F32", 
+              Norway = "#A52A2A",
+              UK = "#DAA06D", 
+              Korea = "#800020", 
+              Greece = "#E97451", 
+              Germany = "#F0E68C",
+              Australia = "#808000", 
+              Brazil = "#FFAC1C", 
+              Finland = "#E3963E",
+              Austria = "#FBCEB1", 
+              Belgium = "#FFC000", 
+              Malaysia = "#F4BB44",
+              Netherlands = "#FFE5B4", 
+              Poland = "#FF4433",
+              Switzerland = "#FA8072",
+              Romania = "#FFF5EE",
+              Slovenia = "#9F2B68",
+              Uganda = "#DE3163",
+              Cyprus = "#811331",
+              Hong_Kong = "#DC143C",
+              Japan = "#AA336A", 
+              Czech_Republic = "#C9A9A6", 
+              Ghana = "#FF69B4",
+              Hungary = "#673147", 
+              India = "#E30B5C", 
+              Israel = "#D8BFD8", 
+              Kenya = "#DA70D6",
+              Luxembourg = "#770737",
+              Mexico = "#E0B0FF",
+              Monaco = "#CCCCFF", 
+              Portugal = "#A95C68", 
+              Saudi_Arabia = "#51414F", 
+              Singapore = "#BDB5D5", 
+              Slovakia = "#FAF9F6",
+              South_Africa = "#EEDC82", 
+              Tanzania = "#DAA520", 
+              Zimbabwe = "#F0E68C")
+# colnames(net_matrix2)[colnames(net_matrix2) == "Hong Kong"] <- "Hong_Kong"
+# rownames(net_matrix2)[rownames(net_matrix2) == "Hong Kong"] <- "Hong_Kong"
+# colnames(net_matrix2)[colnames(net_matrix2) == "Czech Republic"] <- "Czech_Republic"
+# rownames(net_matrix2)[rownames(net_matrix2) == "Czech Republic"] <- "Czech_Republic"
+# colnames(net_matrix2)[colnames(net_matrix2) == "Saudi Arabia"] <- "Saudi_Arabia"
+# rownames(net_matrix2)[rownames(net_matrix2) == "Saudi Arabia"] <- "Saudi_Arabia"
+# colnames(net_matrix2)[colnames(net_matrix2) == "South Africa"] <- "South_Africa"
+# rownames(net_matrix2)[rownames(net_matrix2) == "South Africa"] <- "South_Africa"
+
+circos.clear()
+# par(mfrow=c(1,1), mar=c(0,0,0,0))
+# circos.par(circle.margin = 0.5)  # margin is 0.5 of the radius of the circle, on the four sides.
+#set separately margins on each side
+circos.par(canvas.xlim = c(-1, 1), canvas.ylim = c(-1.2, 1.5))
+
+pdf(file = here("plots", "Figure_country_collaboration.pdf"), width=8, height=8, pointsize=10)
+
+#make chord diagram
+chordDiagram(net_matrix2,
+               annotationTrack = "grid",
+               preAllocateTracks = 1, 
+               grid.col = my.cols2
+  )
+
+#add numbers and names
+circos.trackPlotRegion(track.index = 1, 
+                       panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  if(xlim[2] > 10) {                 #only plot names if > 10 links
+  sector.name = get.cell.meta.data("sector.index")
+  circos.text(mean(xlim),
+              ylim[1] + .2, 
+              sector.name, 
+              facing = "clockwise", 
+              niceFacing = TRUE,
+              adj = c(0, 0.5))
+  circos.axis(h = "top", 
+              labels.cex = 0.5,
+              major.tick.length = 0.2, 
+              #\sector.index = sector.name,
+              track.index = 2)
+  }
+},
+bg.border = NA)
+
+dev.off()
+
+```
+
+
+### Top countries 
+Top contributing countries in terms of numbers of collaborations
+
+```{r top institutions collaborations, echo=FALSE}
+#re-create the matrix
+net_matrix3 <- as.matrix(NetMatrix2)
+#net_matrix2 <- net_matrix2[rownames(NetMatrix2), countries]
+total_coauth <- rowSums(net_matrix3) 
+total_within <- diag(net_matrix3)
+total_between <- total_coauth - total_within
+prop_within <-  total_within / total_coauth  #proportion of collaborations within country
+prop_between <- total_between / total_coauth  #proportion of collaborations with other countries
+
+country_collab_df <- data.frame(Country = str_to_title(rownames(net_matrix3)), Total_coauth = total_coauth, Total_within = total_within, Prop_within = prop_within, Total_between = total_between, Prop_between = prop_between)
+country_collab_df$Country[country_collab_df$Country == "Usa"] <- "USA"
+
+#display styled table of collaborations for all countries
+country_collab_df %>% 
+  arrange(desc(Total_coauth)) %>% 
+  kbl() %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped"))
+
+```
+
+
+### Countries per paper
+Number of affiliated countries per paper across years
+
+```{r authors affiliated countries years, echo=FALSE}
+
+bib2$Countries_count <- str_count(bib2$AU_CO, pattern = ";") + 1 #count symbols that separate authors
+
+#scatterplot with labels for most highly cited papers, using ggrepel 
+bib2 %>% 
+  filter(!is.na(Countries_count)) %>%
+  ggplot(aes(x = PY, y = Countries_count, size = 1, alpha = 0.1)) + 
+  geom_point(col = "grey") +
+  theme_minimal() +
+  theme(legend.position = "none") + 
+  ylim(0, 20) +
+  guides(colour = "none", alpha = "none", scale = "none") + #guides(size = guide_legend("text")) + 
+  labs(x = "Publication Year", y = "Number of affiliated countries per paper") #+ title = "Authors", caption = "Source: Scopus"
+
+ggsave(filename = here("plots", "Figure_year_countries.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Top institutions
+Top  institutions in terms of numbers of papers contributed to
+
+```{r top institutions, echo=FALSE}
+
+Institutions <- bib_sco %>% select(AU_UN, PY, longID) %>% separate_rows(AU_UN, sep = ";") #split rows with multiple values
+Institutions <- Institutions %>% filter(!is.na(AU_UN)) %>% filter(AU_UN != "NOTREPORTED") #remove empty records
+#dim(Institutions) #2016
+#length(unique(Institutions$AU_UN)) #792
+#View(Institutions) #needs some cleaning
+Institutions$AU_UN2 <- str_replace_all(Institutions$AU_UN, c('\\(AT THE TIME OF THE STUDY\\) '='',
+                                      ' \\(RWTH\\)'='',
+                                      ' \\(AU\\)'='',
+                                      ' SHENZHEN RESEARCH INSTITUTE'='',
+                                      ' \\(VISITING SCIENTIST\\)'='',
+                                      '\\(CIDE\\) JOINT CENTRE UNIVERSITY OF VALENCIA-CSIC-GENERALITAT VALENCIAN'='- CIDE \\(CSIC-UV-GV\\)',
+                                      ' \\(CEFAS\\)'='',
+                                      ' \\(UMWELTBUNDESAMT\\)'='',
+                                      ' \\(BFR\\)'='',
+                                      'GERMANY'='',
+                                      'INST. '='INSTITUTE ',
+                                      ' AT FLORIDA ATLANTIC UNIVERSITY'='',
+                                      ' – UFZ'='',
+                                      '-UFZ'='',
+                                      'UFZ'='',
+                                      ' \\(GUANGZHOU\\)'='',
+                                      "\\(INSTITUT FRANÇAIS DE RECHERCHE POUR L'EXPLOITATION DE LA MER\\)"="\\(FRENCH RESEARCH INSTITUTE FOR EXPLOITATION OF THE SEA\\)",
+                                      ' \\(IMR\\)'='',
+                                      'KEY LABORATORY OF POLLUTION PROCESSES AND ENVIRONMENTAL CRITERIA \\(NANKAI UNIVERSITY\\)'='NANKAI UNIVERSITY',
+                                      ' \\(NFRDI\\)'='',
+                                      '\\(AT TIME OF STUDY\\) '='',
+                                      '	NILU \\(NORWEGIAN INSTITUTE FOR AIR RESEARCH\\)'='NORWEGIAN INSTITUTE FOR AIR RESEARCH',
+                                      'NILU - '='',
+                                      'NILU-'='',
+                                      'NINA - '='',
+                                      ' \\(NILU\\)'='',
+                                      ' \\(NINA\\)'='',
+                                      ' \\(NIVA\\)'='',
+                                      ' – NORWEGIAN SCIENTIFIC COMMITTEE FOR FOOD AND ENVIRONMENT'='',
+                                      ' \\(NPI\\)'='',
+                                      'NORWEGIAN POLAR RESEARCH INSTITUTE'='NORWEGIAN POLAR INSTITUTE',
+                                      ' \\(NVH\\)'='',
+                                      'NORWEGIAN UNIVERSITY OF LIFE SCIENCE'='NORWEGIAN UNIVERSITY OF LIFE SCIENCES',
+                                      ' \\(NMBU\\)'='',
+                                      ' \\(NTNU\\)'='',
+                                      'ONTARIO MINISTRY OF THE ENVIRONMENT AND CLIMATE CHANGE'='ONTARIO MINISTRY OF THE ENVIRONMENT',
+                                      'OREBRO'='ÖREBRO',
+                                      'PART OF WAGENINGEN UNIVERSITY AND RESEARCH'='WAGENINGEN UNIVERSITY',
+                                      'SAN JOSE'='SAN JOSÉ',
+                                      ' AT ALBANY'='',
+                                      ' \\(IVL\\)'='',
+                                      ' \\(SLU\\)'='',
+                                      'AANDM'='A AND M',
+                                      ' AT GALVESTON'='',
+                                      ' \\(UIT\\)'='',
+                                      'THE '='',
+                                      ' \\(UNIS\\)'='',
+                                      ' SYDNEYNEW SOUTH WALES'=' SYDNEY',
+                                      ' \\(NAFIRRI\\)'='',
+                                      'UIT – THE '='',
+                                      'UIT THE '='',
+                                      'UIT-THE '='',
+                                      'UMEA'='UMEÅ',
+                                      'MONTREÁL'='MONTRÉAL',
+                                      ' \\(UDEM\\)'='',
+                                      ' À MONTRÉAL'='',
+                                      ' À TROIS-RIVIÈRES \\(UQTR\\)'='',
+                                      'MONTRE´AL'='MONTRÉAL',
+                                      'UNIVERSITE´'='UNIVERSITÉ',
+                                      'QUE´BEC'='QUÉBEC',
+                                      ' \\(UNIS\\)'='',
+                                      ' \\(USN\\)'='',
+                                      'UNIVERSITY OF AARHUS'='AARHUS UNIVERSITY',
+                                      ' \\(UOFA\\)'='',
+                                      ' \\(VUB\\)'='',
+                                      ' \\(UCPH\\)'='',
+                                      'GDAÑSK'='GDAŃSK',
+                                      'GDÁNSK'='GDAŃSK',
+                                      "HAWAII AT MANOA"="HAWAI'I",
+                                      'LIEGE'='LIÈGE',
+                                      'MELBOURNEVIC'='MELBOURNE',
+                                      'NEWCASTLENEW SOUTH WALES'='NEWCASTLE',
+                                      ' \\(UIO\\)'='',
+                                      ' - INSTITUTE FOR ENVIRONMENTAL STUDIES \\(IVM\\)'='',
+                                      ' DIR\\.'='',
+                                      ' SCIENCESS'='SCIENCES',
+                                      ' NATL\\.'=' NATIONAL',
+                                      ' ENVIRON\\.'=' ENVIRONMENTAL',
+                                      ' RES. '=' RESEARCH',
+                                      'GT. LAKES LAB. FISH./AQUATIC SCI.'='GREAT LAKES LABORATORY FOR FISHERIES AND AQUATIC SCIENCES',
+                                      'MEICAL '='MEDICAL ',
+                                      'NORWEGIAN UNIVERSITY OF LIFESCIENCES'='NORWEGIAN UNIVERSITY OF LIFE SCIENCES',
+                                      'NORWEGIAN SCHOOL OF VETERINARY SCIENCES'='NORWEGIAN SCHOOL OF VETERINARY SCIENCE',
+                                      ' \\(AIST\\)'='')
+                )
+
+#length(unique(Institutions$AU_UN2)) #720
+#sort(unique(Institutions$AU_UN2)) #much better
+
+#remove duplicated affiliations within papers, count papers per institutional affiliation and plot:
+Institutions %>% distinct(PY, longID, AU_UN2, .keep_all=TRUE) %>%
+  count(AU_UN2) %>%
+  filter(!is.na(AU_UN2)) %>%
+  arrange(n) %>%
+  top_n(20) %>% 
+  mutate(class = factor(AU_UN2, levels = AU_UN2)) %>%
+  ggplot(aes(x = class, y = n)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::comma(n)), hjust = 0, nudge_y = 1) +
+  coord_flip() +
+  scale_y_continuous(breaks=seq(0,100,10)) +
+  labs(x = "", y = "Article count", title = "Top 20 institutions") + 
+  theme_minimal()
+
+ggsave(filename = here("plots", "Figure_top20institutions.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Institutions per paper
+Number of affiliated institutions per paper across years
+
+```{r authors affiliated institutions years, echo=FALSE}
+
+#count number of different institutions per paper and plot by year
+Institutions %>%      
+  group_by(longID) %>%
+  summarise(count = n_distinct(AU_UN2), PY = first(PY)) %>%
+  filter(!is.na(count)) %>%
+  ggplot(aes(x = PY, y = count, size = 1, alpha = 0.1)) + 
+  geom_point(col = "grey") +
+  theme_minimal() +
+  theme(legend.position = "none") + 
+  ylim(0, 20) +
+  guides(colour = "none", alpha = "none", scale = "none") + #guides(size = guide_legend("text")) + 
+  labs(x = "Publication Year", y = "Number of affiliated institutions per paper") #+ title = "Authors", caption = "Source: Scopus"
+
+ggsave(filename = here("plots", "Figure_year_institutions.pdf"),
+       height = 5, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Abstracts conceptual structure   
+		Terms extracted from abstracts
+```{r conceptual abstract, echo=FALSE}
+
+#using function from bibliometrix
+conceptual <- conceptualStructure(bib2, field = "AB", minDegree = 10, k.max = 3, stemming = FALSE, labelsize = 10)
+#str(conceptual)
+plot(conceptual$graph_terms)
+
+ggsave(filename = here("plots", "Figure_abstracts_conceptual_map.pdf"),
+       height = 10, width = 10,
+       device = cairo_pdf)
+```
+
+
+### Keywords thematic map  
+Based on Keywords Plus from SCOPUS database
+```{r keywords thematic map , echo =  FALSE}
+
+#using function from bibliometrix
+thematic <- thematicMap(bib2, field = "ID", n = 200, minfreq = 2, stemming = FALSE, size = 0.5, n.labels = 10, ngrams = 3, repel = TRUE)
+plot(thematic$map)
+
+ggsave(filename = here("plots", "Figure_keywords_thematic_map.pdf"),
+       height = 10, width = 10,
+       device = cairo_pdf)
+```
+
+
