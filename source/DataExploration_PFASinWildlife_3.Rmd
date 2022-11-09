@@ -2259,12 +2259,13 @@ Sampling_Period_Class_no_NA_SHORT_2 <- Sampling_Period_Class_no_NA_SHORT [,-4]
 
 #View(Sampling_Period_Class_no_NA_SHORT_2)
 
-Sampling_period_plot <- ggplot(Sampling_Period_Class_no_NA_SHORT_2, aes(x=Species_higher_taxon, y=SamplingPeriod)) + 
+Sampling_period_plot <- ggplot(Sampling_Period_Class_no_NA_SHORT_2, aes(x=Species_higher_taxon, y=SamplingPeriod,)) + 
   geom_violin() +
   labs(x="Class", y = "Sampling period in years") + 
   theme_minimal()  +
   theme(axis.text.x = element_text(angle = 90))  +
-  scale_x_discrete(limits = c("Actinopterygii", "Aves", "Mammalia","Malacostraca","Bivalvia", "Gastropoda", "Reptilia", "Insecta", "Cephalopoda", "Chondrichthyes"))
+  scale_x_discrete(limits = c("Actinopterygii", "Aves", "Mammalia","Malacostraca","Bivalvia", "Gastropoda", "Reptilia", "Insecta", "Cephalopoda", "Chondrichthyes")) + 
+  geom_jitter(shape=16, position=position_jitter(0.2))
 
 #ggsave("Sampling_period_plot.jpg", plot = Sampling_period_plot, device = 'jpg', width = 200, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 
