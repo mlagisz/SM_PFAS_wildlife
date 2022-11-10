@@ -1,10 +1,21 @@
 ---
-title: "DataExplorations_PFASWildlife"
-output: html_document
+title: "Systematic map"
+author: "Catharina Vendl"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    code_folding: hide
+    theme: united
+    highlight: tango
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+
 ---
 
 #Load packages
-```{r pressure, echo=FALSE}
+```{r pressure, echo=FALSE, message=FALSE, warning=FALSE}
 
 
 library(dplyr)
@@ -38,15 +49,17 @@ library(webshot)
 ```
 
 #Set directory
-```{r pressure, echo=FALSE}
-setwd("Z:/Ideel-Lab_2/PFAS_projects/SystMap_PFASconcWildlife/Data_Analysis")
+```{r , setup, include=FALSE}
 
-setwd("C:/Work/Github_SM_PFAS_wildlife/data")
+#setwd("C:/Work/Github_SM_PFAS_wildlife/data")
+
+knitr::opts_knit$set(root.dir = 'C:/Work/Github_SM_PFAS_wildlife/data')
+
 
 ```
 
 #Import csv files
-```{r pressure, echo=FALSE}
+```{r , echo=FALSE}
 Bibliometrics <- read.csv("PFASinWildlife_Bibliometrics.csv")
 Country_Region <- read.csv("PFASinWildlife_Country_Region.csv")
 PFAS_Compounds <- read.csv("PFASinWildlife_PFAS_Compounds.csv")
@@ -70,7 +83,7 @@ Species_traits <- read.csv("Species_clean_all_traits_Losia.csv")
 ```
 
 #Bibliometrics data
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #View(Bibliometrics)
 dim(Bibliometrics)
@@ -124,7 +137,7 @@ table_Country_first_author %>%
 ```
 
 #Country_Region
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #View(Country_Region)
 dim(Country_Region)
@@ -270,7 +283,7 @@ dim(Sample_Site_Country_first_Ch_Ch)
 ```
 
 #PFAS_Compounds
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #View(PFAS_Compounds)
 dim(PFAS_Compounds)
@@ -377,7 +390,7 @@ Single_PFAs_compound_studies <- left_join (PFAS_Compounds_18_n1, PFAS_Compounds_
 ```
 
 #Species
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #View(Species)
 dim(Species)
@@ -438,7 +451,7 @@ table_species %>%
 ```
 
 #Species_traits
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 Species_traits %>% distinct(Study_ID)
 
@@ -579,7 +592,7 @@ table_1_Species_higher_taxon <- Species_traits_studies_1 %>%
 ```
 
 ### Animal group
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #View(SpeciesGroups)
 dim(SpeciesGroups)
@@ -628,7 +641,7 @@ dim(SpeciesGroups_distinct %>% filter (Other =='Other'))
 
 
 #SystematicMap
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #View(SystematicMap)
 dim(SystematicMap)
@@ -823,10 +836,6 @@ Sampling_Period_Class_2 <- Sampling_Period_Class %>%
   group_by(SamplingPeriod, Species_higher_taxon) %>%
   summarise(n = n())
 
-
-
-
-
 #Delete rows with NA
 Sampling_Period_Class_no_NA <- na.omit(Sampling_Period_Class_2)
 dim(Sampling_Period_Class_no_NA)
@@ -956,7 +965,7 @@ table_species %>%
 
 
 #Critical appraisal
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #View(CriticalAppraisal)
 dim(CriticalAppraisal)
@@ -993,8 +1002,6 @@ table_Funding_Statement <- PubYear_Funding_Statement %>%
 
 Funding_Pub_Year
 
-
-
 ```
 
 
@@ -1004,7 +1011,7 @@ Funding_Pub_Year
 ####Preliminary data analysis
 
 ### Bibliometric data
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #Publication_year
 Publication_year_bar <- Bibliometrics_5_distinct %>% 
@@ -1075,7 +1082,7 @@ Country_FirstAuthor_bar
 ```
 
 ###Country_Region
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #Country_Region_Sample_Collection
 
@@ -1116,7 +1123,7 @@ Country_Region_Sample_Collection_bar_3
 ```
 
 ### pfas compound counts
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 pfas_bar <- PFAS_Compounds_18 %>% 
   group_by(PFAS_name) %>%
@@ -1216,7 +1223,7 @@ PFAS_Compounds_scatter_plot <- ggplot(PFAS_Compounds_22, aes(x=C_length, y=n)) +
 ```
 
 ###Species counts
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #Bar plot with all species
 species_bar <- Species_distinct_2 %>% 
@@ -1370,7 +1377,7 @@ BM_plot
 
 ```
 ###Animal group
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #Turn SpeciesGroups_distinct into long format
 
@@ -1450,7 +1457,7 @@ SpeciesGroups_long_3 %>%
 ```
 
 ###Systematic map
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #PFAS_Focus
 PFAS_focus_bar <- SystematicMap_6 %>% 
@@ -1593,7 +1600,7 @@ Tissue_one_many_bar
 ```
 
 ###CriticalAppraisal
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #COI_statement
 table_COI_statement <- CriticalAppraisal_distinct %>%
@@ -1813,7 +1820,7 @@ Analysis_code_bar
 ###More sophisticated plots
 
 ### Heatmap PFAS by Habitat
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #Delete PFAS <3
 PFAS_Compounds_25 <- PFAS_Compounds_18[PFAS_Compounds_18$PFAS_name %in% names(which(table(PFAS_Compounds_18$PFAS_name) > 3)), ]
@@ -1842,7 +1849,7 @@ pfas_habitat_heat
 ```
 
 ### Heatmap PFAS by Biogeographical region
-```{r pressure, echo=FALSE}
+```{r, include=FALSE}
 
 PFAS_Compounds_27 <- left_join(PFAS_Compounds_25, SystematicMap_6, by = c("Study_ID" = "Study_ID")) %>%
   group_by(PFAS_name, Biogeographical_region) %>%
@@ -1863,7 +1870,7 @@ pfas_biogeographic_heat <- PFAS_Compounds_27 %>%
 ```
 
 ### PFAS vs. Species Heatmap
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 temp <- full_join(Species_distinct_8, PFAS_Compounds_25) %>%
   group_by(PFAS_name, Scientific_name) %>%
@@ -1890,7 +1897,7 @@ pfas_species_heat_4
 ```
 
 ### Line Plot Publication Year - biogeographical regions
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 cnt_year2 <-   
   cnt_year %>% 
@@ -1937,7 +1944,7 @@ pub_year_geograph_line
 
 ```
 ### Heatmap biogeographical regions by Publication year
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 PFAS_Compounds_30 <- left_join(SystematicMap_6, Bibliometrics_5_distinct, by = c("Study_ID" = "Study_ID")) %>%
   group_by(Publication_year, Biogeographical_region) %>%
@@ -1960,7 +1967,7 @@ BioRegion_PublicationYear_heat
 
 
 ### Heatmap PFAS by Publicaion year
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 PFAS_Compounds_28 <- left_join(PFAS_Compounds_25, Bibliometrics_5_distinct, by = c("Study_ID" = "Study_ID")) %>%
   group_by(PFAS_name, Publication_year) %>%
@@ -1979,7 +1986,7 @@ pfas_PublicationYear_heat
 
 
 ### Heatmap Sex by class
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 Sex <- SystematicMap_6[,c(1,12)]
 Class <- Species_traits[, c(1,4)]
@@ -2006,7 +2013,7 @@ Class_Sex_heat
 ```
 
 ### Heatmap developmental stage by class
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 Development <- SystematicMap_6[,c(1,14)]
 
@@ -2034,7 +2041,7 @@ Class_Development_heat
 
 
 ### author by country map
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 # ingest data
 count_country <- Bibliometrics_5_distinct %>%
@@ -2072,7 +2079,7 @@ first_author.map_3
 
 
 ## Sankey plot (first author - sampling site)
-```{r pressure, echo=FALSE}
+```{r, echo=FALSE}
 
 #Merge dataframes
 
