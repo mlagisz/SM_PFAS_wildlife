@@ -35,6 +35,7 @@ library(ggtree)
 #Import cleaned csv files
 ```{r , echo=FALSE}
 species_all <- read.csv("./data/Species_clean_Losia.csv")
+
 #View(Species)
 
 #Species_traits <- read.csv("./data/Species_clean_all_traits_Losia.csv")
