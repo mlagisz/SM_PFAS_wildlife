@@ -1954,8 +1954,7 @@ Biogeographical %>%
 
 pub_year_geograph_line
 
-#ggsave("pub_year_geograph_line.jpg", plot = pub_year_geograph_line, device = 'jpg', width = 168, height = 100, units = "mm",
-#       dpi = 300, limitsize = TRUE)
+#ggsave("pub_year_geograph_line.jpg", plot = pub_year_geograph_line, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 
 ```
 ### Heatmap biogeographical regions by Publication year
@@ -2226,9 +2225,11 @@ ggplot(Habitat_Species_count, aes(x= reorder(Habitat, -n), y = reorder(Species_h
   labs(y="Classes", x = "Habitat") + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   scale_fill_discrete(name= 'Count') +
-  scale_x_discrete(limits = c("Marine", "Freshwater", "Terrestrial inland",  "Terrestrial coastal", "Mixed", "Estuarine"))
+  scale_x_discrete(limits = c("Marine", "Terrestrial coastal", "Estuarine", "Terrestrial inland",  "Freshwater", "Mixed")) +
+    scale_y_discrete(limits=rev)
 
 #ggsave("Habitat_Species_bubble.jpg", plot = Habitat_Species_bubble, device = 'jpg', width = 150, height = 150, units = "mm", dpi = 300, limitsize = TRUE)
+
 
 ##########
 
@@ -2267,7 +2268,8 @@ Region_Species_bubble <- ggplot(Region_Species_count, aes(x= reorder(Biogeograph
     geom_point(alpha=0.7) + theme_minimal() +
   labs(y="Classes", x = "Biogeographical region") + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  scale_x_discrete(limits = c( "Temperate",   "Subtropical", "Polar",  "Mixed","Tropical"))
+  scale_x_discrete(limits = c( "Polar", "Temperate",   "Subtropical",  "Tropical", "Mixed"))+
+    scale_y_discrete(limits=rev)
 
 #ggsave("Region_Species_bubble.jpg", plot = Region_Species_bubble, device = 'jpg', width = 150, height = 150, units = "mm", dpi = 300, limitsize = TRUE)
 
@@ -2281,13 +2283,17 @@ Sampling_Period_Class_no_NA_SHORT_2 <- Sampling_Period_Class_no_NA_SHORT [,-4]
 
 #View(Sampling_Period_Class_no_NA_SHORT_2)
 
-Sampling_period_plot <- ggplot(Sampling_Period_Class_no_NA_SHORT_2, aes(x=Species_higher_taxon, y=SamplingPeriod,)) + 
+Sampling_period_plot <- 
+ggplot(Sampling_Period_Class_no_NA_SHORT_2, aes(x=Species_higher_taxon, y=SamplingPeriod, fill=Species_higher_taxon)) + 
   geom_violin() +
+  geom_jitter(shape=16, position=position_jitter(0.2)) +
   labs(x="Class", y = "Sampling period in years") + 
   theme_minimal()  +
-  theme(axis.text.x = element_text(angle = 90))  +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  +
   scale_x_discrete(limits = c("Actinopterygii", "Aves", "Mammalia","Malacostraca","Bivalvia", "Gastropoda", "Reptilia", "Insecta", "Cephalopoda", "Chondrichthyes")) + 
-  geom_jitter(shape=16, position=position_jitter(0.2))
+  scale_fill_manual(values = c("Actinopterygii"="blue", "Aves"="red", "Mammalia"="green", "Malacostraca"="orange", "Bivalvia"="purple", "Gastropoda"="yellow", "Reptilia"="black", "Insecta"="brown", "Cephalopoda"="pink", "Chondrichthyes"="gray")) +
+  guides(fill = FALSE)
+
 
 #ggsave("Sampling_period_plot.jpg", plot = Sampling_period_plot, device = 'jpg', width = 200, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 
