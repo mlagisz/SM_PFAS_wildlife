@@ -1,0 +1,203 @@
+---
+title: "Systematic map"
+author: "ML"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    code_folding: hide
+    theme: united
+    highlight: tango
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+#Load packages
+```{r load packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rotl)
+library(ape) #potential namespace clashes with ggtree
+library(ggplot2)
+library(ggnewscale)
+library(ggtreeExtra)
+library(ggtree) 
+# #if ggtree not installing try:
+# library(BiocManager)
+# BiocManager::install("ggtree")
+
+#library(dplyr)
+#library(rlist)
+```
+
+#Import cleaned csv files
+```{r , echo=FALSE}
+species_all <- read.csv("./data/Species_clean_Losia.csv")
+#View(Species)
+
+#Species_traits <- read.csv("./data/Species_clean_all_traits_Losia.csv")
+#View(Species_traits)
+```
+
+#Species list data
+```{r get species list, echo=FALSE}
+dim(species_all)
+str(species_all)
+names(species_all)
+
+species_all %>% summarise_all(n_distinct) #count-unique-values-for-every-column
+
+species_all %>% count(Species_higher_taxon) #mix of ranks
+species_all %>% count(Name_tax_rank)  #mix of ranks
+species_all %>% count(Scientific_name) %>% arrange(n, desc = TRUE)
+
+mylist <- unique(species_all$Scientific_name)
+length(mylist) #1042 unique Latin names (species or higher)
+#table(is.na(mylist)) #no NA
+```
+
+Get tree
+
+```{r rotl species tree, echo=FALSE}
+taxa <- tnrs_match_names(mylist, context_name = "Animals") #find iTOL records
+#View(taxa)
+
+#check flags = potentially problematic taxon names
+table(taxa$flags) #921 have no flags , other have some flags
+table(taxa$number_matches) #mostly single matches (982)
+table(taxa$is_synonym) #mostly original name, only 87 used synonyms
+
+#keep only records without any lethal flags
+mylist2 <- taxa[taxa$flags == "" | taxa$flags == "sibling_higher" | taxa$flags == "infraspecific", "search_string"]
+length(mylist2) #1017 out of 1042 names
+
+#see taxa with problems 
+
+#run search again using cleaned taxa names list
+taxa2 <- tnrs_match_names(mylist2, context_name = "Animals") #find iTOL records
+
+#retrieve a phylogenetic tree for this list of taxa names
+mytree <- tol_induced_subtree(ott_ids = taxa2$ott_id, label_format = "name") #extract subtree of taxa2
+#plot(mytree, cex=.8, label.offset =.1, no.margin = TRUE)
+names(mytree)
+#str(mytree)
+
+ape::write.tree(mytree, file = "./data/phylogenetic_tree.tre") #save the tree with 921 tips (mostly species) - this function does not work correctly after tre editing below
+#mytree <- ape::read.tree(file = "./data/phylogenetic_tree.tre") #if you need to read it
+
+# Saving as objects in RData format
+save(mytree, taxa2, file = "./data/tree_data.RData")
+# To load the data again
+#load("./data/tree_data.RData")
+
+#mytree$tip.label #clean _(species_in_domain_Eukaryota),_(genus_in_Opisthokonta), mrcaott13615ott65415, mrcaott41495ott150711, mrcaott12778ott32449
+
+## clean tip labels
+mytree$tip.label <- gsub("\\(.*", "", mytree$tip.label) #remove comments
+
+tip <- c("mrcaott307132ott864246", "mrcaott13615ott65415", "mrcaott42137ott854208", "mrcaott12778ott32449", "mrcaott235665ott306513", "mrcaott41495ott150711") #labels of internal nodes at tips
+mytree <- drop.tip(mytree, tip) #remove tips with the odd names above (not sure which taxa they represent - likely just internal nodes, i.e. higher taxa ranks), some of them are "NA" and will mess up the plot
+mytree$tip.label <- gsub("_"," ", mytree$tip.label) #get rid of the underscores
+#mytree$tip.label <- gsub("Capsicum frutescens", "Capsicum annum", mytree$tip.label) #if needed to replace labels
+#str(mytree)
+
+#summarise how many names are matching and how many changed:
+length(mytree$tip.label)
+length(intersect(mytree$tip.label, mylist)) #820 names matching exactly to the original species list
+length(setdiff(mytree$tip.label, mylist)) #83 names on the tree but not on the original species list (mostly synonyms - ok)
+length(setdiff(mylist, mytree$tip.label)) #222 names on the original species list  but not on the tree - many higher taxonomic levels
+length(intersect(mytree$tip.label, taxa2$unique_name)) #897 matching exactly to the adjusted unique species list from iTOL
+table(tolower(taxa2$search_string) == tolower(taxa2$unique_name)) #112 names not matching
+
+# #replace "unique_name" with "search_string" on a tree tips
+# tips <- data.frame(tips = mytree$tip.label)
+# taxa2_df <- data.frame(tips = taxa2$unique_name, new_tips = str_to_sentence(taxa2$search_string))
+# tips_taxa2_df <- left_join(tips, taxa2_df, by = "tips")
+# #str(tips_taxa2_df)
+# table(tips_taxa2_df$tips == tips_taxa2_df$new_tips) #95 not matching
+# mytree$tip.label <- tips_taxa2_df$new_tips  #replace rips names
+
+
+save(mytree, taxa2, file = "./data/tree_data.RData")
+```
+
+Plot tree
+
+```{r basic circular tree}
+#load("./data/tree_data.RData") #load tree if skipped previous chunk
+str(mytree)
+mytree$node.label <- NULL
+ 
+ggtree::ggtree(mytree, layout = "circular", lwd = 0.75) + 
+  geom_tiplab2(align = T, linetype = NA, size = 2, offset = 4, hjust = 0.5) #add labels
+```
+
+Plot tree with counts and colours
+
+```{r prep tree}
+#empty data frame with tree tips labels
+d1 <- data.frame(tiplabels = mytree$tip.label)
+
+#get counts of frequencies of species in a separate data frame
+sample_data <- as.data.frame(count(species_all, Scientific_name))
+sample_data <- mutate(sample_data, tip.label = Scientific_name) #add a tip.label column copied from Scientific_name
+# summary(sample_data2$tip.label)
+#str(tips_taxa2_df)
+# table(mytree$tip.label == sample_data$tip.label) #95 not matching
+# mytree$tip.label
+
+#add info on higher taxa 
+sample_data_species <- left_join(sample_data, species_all[ ,c("Scientific_name","Species_higher_taxon")], by = "Scientific_name")
+sample_data_species <- distinct(sample_data_species, Scientific_name, .keep_all = TRUE) #remove duplicated rows
+sample_data_species$Species_higher_taxon_other <- as.factor(sample_data_species$Species_higher_taxon)
+levels(sample_data_species$Species_higher_taxon_other) <- c("Actinopterygii", "Amphibia","Arachnida", "other", "other", "Aves", "Bivalvia", "Branchiopoda", "Cephalopoda", "other", "Chondrichthyes", "Clitellata", "other", "other", "Gastropoda", "other", "other", "other", "Insecta", "Malacostraca", "Mammalia", "other", "other", "Polychaeta", "Reptilia", "other") #replace with "other" if <5 taxon occurrences
+length(table(sample_data_species$Species_higher_taxon_other)) #16 values
+
+cols <- c("#0067A5", "#875692", "#F38400", "#000000", "#BE0032", "#C2B280", "#E25822", "#008856", "#E68FAC", "#F3C300", "#F99379", "#604E97", "#F6A600", "#B3446C", "#DCD300", "#8DB600") #set 16 custom color-blind-friendly colours
+
+#match Scientific_name to names from mytaxa
+sample_data_species$rotl_search_string <- tolower(sample_data_species$Scientific_name)
+taxa2_df <- data.frame(rotl_unique_name = taxa2$unique_name, rotl_search_string = taxa2$search_string)
+taxa2_df <- left_join(taxa2_df, sample_data_species, by = c("rotl_search_string"))
+str(taxa2_df)
+length(taxa2_df$rotl_unique_name) #1017
+length(unique(taxa2_df$rotl_unique_name)) #999
+taxa2_df$rotl_unique_name <- gsub("\\(.*", "", taxa2_df$rotl_unique_name) #remove comments
+taxa2_df <- distinct(taxa2_df, rotl_unique_name, .keep_all = TRUE) #remove duplicated rows
+
+length(d1$tiplabels) #903
+length(unique(d1$tiplabels)) #903
+length(mytree$tip.label) #903
+intersect(taxa2_df$rotl_unique_name, d1$tiplabels) #901 overlap - trim
+setdiff(taxa2_df$rotl_unique_name, d1$tiplabels) #98 missing
+setdiff(d1$tiplabels, taxa2_df$rotl_unique_name) #2 missing
+
+#create dataframe matching 
+d2 <- left_join(d1, taxa2_df, by = c("tiplabels", "rotl_unique_name"))
+merge(d1, taxa2_df, by=c("tiplabels", "rotl_unique_name"), all = FALSE)
+d2 <- merge(x = d1, y = taxa2_df, by.x='tiplabels', by.y='rotl_unique_name', fill="NA", all.x = FALSE)
+str(d2) #901 - missing "Ammodytidae", "mrcaott12409ott26366" - not matching in d1
+prunedtree <- drop.tip(mytree, c("Ammodytidae", "mrcaott12409ott26366"))
+prunedtree$tip.label
+
+p_tree <- ggtree::ggtree(prunedtree, layout = "circular", lwd = 0.75) %<+% d2 + 
+  #geom_tiplab2(align = T, linetype = NA, size = 2, offset = 4, hjust = 0.5)  #tip labels
+  aes(col = Species_higher_taxon_other) +
+  theme(legend.position = "bottom") + 
+  scale_colour_manual(values = cols, (title = ""))  +
+  new_scale_fill() + 
+  geom_fruit(geom = geom_bar, mapping = aes(x = n, col = "gray80"), stat = "identity", col = "gray80", orientation = "y", axis.params = list(axis = "x", text.angle = 0, hjust = 0, text.size = 3), grid.params = list(alpha = 0.3), offset = 0.085, pwidth = 0.55, alpha = 0.8) + 
+  guides(fill ="none") 
+rotate_tree(treeview = p_tree, angle = 90)
+
+
+#Next?
+#sample_data %>% arrange(-n) %>% head(10) # add silhouettes to these 10 most common taxo?
+#d2 %>% arrange(-n) %>% head(10) %>% select(tiplabels, Species_higher_taxon_other, n) # same, with higher taxa
+
+```
+
+
+```

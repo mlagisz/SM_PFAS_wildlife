@@ -1889,7 +1889,22 @@ pfas_species_heat_3 <- pfas_species_heat_2 %>% filter (!PFAS_name == 'NA')
 dim(pfas_species_heat_3)
 
 pfas_species_heat_4 <- pfas_species_heat_3 %>% ggplot(aes(reorder(Scientific_name, -n), reorder(PFAS_name, -n),  fill = n)) + 
-  geom_tile() + scale_fill_gradient(low = "white", high = "blue", na.value = NA) + theme_minimal() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), axis.text.y = element_text(size = 7)) + labs(y="PFAS compounds", x = "Scientific species name", fill = 'Count')
+  geom_tile() + scale_fill_gradient(low = "white", high = "dark blue", na.value = NA) + theme_minimal() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="PFAS Names", x = "Scientific species name", fill = 'Count') +
+    scale_y_discrete(limits=rev)
+
+pfas_species_heat_4 <- pfas_species_heat_3 %>% 
+  ggplot(aes(reorder(Scientific_name, -n), reorder(PFAS_name, -n), fill = n)) + 
+  geom_tile() + 
+  scale_fill_gradient(low = "white", high = "dark blue", na.value = NA) + 
+  theme_minimal() + 
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+    axis.text.y = element_text(size = 6)
+  ) + 
+  labs(y="PFAS Names", x = "Scientific species name", fill = 'Count') +
+    scale_y_discrete(limits=rev)
+
+
 pfas_species_heat_4
 
 #ggsave("pfas_species_heat.jpg", plot = pfas_species_heat_4, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
