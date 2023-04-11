@@ -36,7 +36,7 @@ library(ggtree)
 ```{r , echo=FALSE}
 species_all <- read.csv("./data/Species_clean_Losia.csv")
 
-#View(Species)
+View(species_all)
 
 #Species_traits <- read.csv("./data/Species_clean_all_traits_Losia.csv")
 #View(Species_traits)
@@ -193,6 +193,7 @@ p_tree <- ggtree::ggtree(prunedtree, layout = "circular", lwd = 0.75) %<+% d2 +
   guides(fill ="none") 
 rotate_tree(treeview = p_tree, angle = 90)
 
+ggsave("p_tree.jpg", plot = p_tree, device = 'jpg', width = 200, height = 200, units = "mm", dpi = 300, limitsize = TRUE)
 
 #Next?
 #sample_data %>% arrange(-n) %>% head(10) # add silhouettes to these 10 most common taxo?
