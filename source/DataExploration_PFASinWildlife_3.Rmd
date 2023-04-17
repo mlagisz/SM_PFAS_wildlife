@@ -1023,8 +1023,7 @@ Publication_year_bar <- Bibliometrics_5_distinct %>%
 
 Publication_year_bar
 
-#ggsave("Publication_year_bar.jpg", plot = Publication_year_bar, device = 'jpg', width = 168, height = 100, units = "mm",
-#       dpi = 300, limitsize = TRUE)
+#ggsave("Publication_year_bar.jpg", plot = Publication_year_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 
 
 Bibliometrics_5_distinct_10 <- Bibliometrics_5_distinct %>% group_by (Publication_year) %>%
@@ -2052,6 +2051,7 @@ Class_Development_heat <-
   theme(legend.position = "top")
 
 Class_Development_heat
+
 
 #ggsave("Class_Development_heat.jpg", plot = Class_Development_heat, device = 'jpg', width = 168, height = 100, units = "mm",
 #       dpi = 300, limitsize = TRUE)
