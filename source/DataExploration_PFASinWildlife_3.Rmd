@@ -1870,8 +1870,7 @@ pfas_biogeographic_heat <- PFAS_Compounds_27 %>%
 
   pfas_biogeographic_heat
 
-#ggsave("pfas_biogeographic_heat.jpg", plot = pfas_biogeographic_heat, device = 'jpg', width = 168, height = 100, units = "mm",
-#       dpi = 300, limitsize = TRUE)
+#ggsave("pfas_biogeographic_heat.jpg", plot = pfas_biogeographic_heat, device = 'jpg', width = 168, height = 100, units = "mm",dpi = 300, limitsize = TRUE)
 ```
 
 ### PFAS vs. Species Heatmap
@@ -2296,7 +2295,7 @@ ggplot(Sampling_Period_Class_no_NA_SHORT_2, aes(x=Species_higher_taxon, y=Sampli
   theme_minimal()  +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))  +
   scale_x_discrete(limits = c("Actinopterygii", "Aves", "Mammalia","Malacostraca","Bivalvia", "Gastropoda", "Reptilia", "Insecta", "Cephalopoda", "Chondrichthyes")) + 
-  scale_fill_manual(values = c("Actinopterygii"="blue", "Aves"="red", "Mammalia"="green", "Malacostraca"="orange", "Bivalvia"="purple", "Gastropoda"="yellow", "Reptilia"="black", "Insecta"="brown", "Cephalopoda"="pink", "Chondrichthyes"="gray")) +
+  scale_fill_manual(values = c("Actinopterygii"="blue", "Aves"="red", "Mammalia"="green", "Malacostraca"="orange", "Bivalvia"="purple", "Gastropoda"="yellow", "Reptilia"="dark gray", "Insecta"="brown", "Cephalopoda"="pink", "Chondrichthyes"="light gray")) +
   guides(fill = FALSE)
 
 
