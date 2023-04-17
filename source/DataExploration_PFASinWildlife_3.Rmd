@@ -1277,15 +1277,20 @@ species_bar_2 <- left_join(species_bar, Higher_taxon)
 
 species_bar_3 <- species_bar_2 %>% distinct(Scientific_name, Species_higher_taxon, n)
 
-species_bar_4 <- species_bar_3 %>% ggplot(aes(x=reorder(Scientific_name, -n), y=n, fill = Species_higher_taxon)) + theme_minimal() + geom_bar(stat="identity", colour="gray", group = 'Species_higher_taxon') +  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Scientific species name", fill = "Class")  +
+species_bar_4 <- species_bar_3 %>% 
+  ggplot(aes(x = reorder(Scientific_name, -n), y = n, fill = Species_higher_taxon)) + 
+  geom_bar(stat = "identity", group = 'Species_higher_taxon') + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) + 
+  labs(y = "Count", x = "Scientific species name", fill = "Class") +
   coord_flip() + 
   theme_minimal() +
-  theme(legend.position = "top")+
-  scale_fill_manual(values=c("blue", "red","yellow", "green"))  +
+  theme(legend.position = "top") +
+  scale_fill_manual(values = c("light blue", "orange","light yellow", "light green")) +
   theme(legend.position = "top")
 
-#ggsave("species_bar_4.jpg", plot = species_bar_4, device = 'jpg', width = 168, height = 100, units = "mm",
-      dpi = 300, limitsize = TRUE)
+
+#ggsave("species_bar_4.jpg", plot = species_bar_4, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 
 
 #Bar plot IUCN status
