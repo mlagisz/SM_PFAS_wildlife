@@ -1170,18 +1170,31 @@ dim(PFAS_Compounds_21_short)
 #24  5
 
 PFAS_Compounds_long_short <- 
-  ggplot(data = PFAS_Compounds_21_short,
-         aes(x=reorder(PFAS_name, -n),
-             y=n,
-             fill = Chain_length)) + 
+ ggplot(data = PFAS_Compounds_21_short, aes(x = reorder(PFAS_name, -n), y = n, fill = Chain_length)) + 
   geom_bar(stat = "identity") + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) + labs(y="Count", x = "PFAS compounds", fill = 'Carbon chain length') + theme_minimal() + coord_flip()+
-  theme(legend.position = "top")
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1)) + 
+  labs(y = "Count", x = "PFAS compounds", fill = 'Carbon chain length') + 
+  theme_minimal() + coord_flip() + 
+  theme(legend.position = "top") +
+  scale_fill_manual(values = c("black", "grey"))
 
-PFAS_Compounds_long_short
+#ggsave("PFAS_Compounds_long_short.jpg", plot = PFAS_Compounds_long_short, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = T)
 
-#ggsave("PFAS_Compounds_long_short.jpg", plot = PFAS_Compounds_long_short, device = 'jpg', width = 168, height = 100, units = "mm",
-#    dpi = 300, limitsize = T)
+PFAS_Compounds_long
+
+PFAS_Compounds_long <- 
+ ggplot(data = PFAS_Compounds_21, aes(x = reorder(PFAS_name, -n), y = n, fill = Chain_length)) + 
+  geom_bar(stat = "identity") + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1)) + 
+  labs(y = "Count", x = "PFAS compounds", fill = 'Carbon chain length') + 
+  theme_minimal() + coord_flip() + 
+  theme(legend.position = "top") +
+  scale_fill_manual(values = c("black", "grey"))
+
+
+PFAS_Compounds_long
+
+#ggsave("PFAS_Compounds_long.jpg", plot = PFAS_Compounds_long, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = T)
 
 ##########
   ggplot(data = PFAS_Compounds_21,
@@ -1246,7 +1259,7 @@ Species_distinct_10 <- Species_distinct_2[Species_distinct_2$Scientific_name %in
 dim(Species_distinct_10)
 #505   3
 
-species_bar <- Species_distinct_10 %>% 
+species_bar <- Species_distinct_8 %>% 
   group_by(Scientific_name) %>%
   summarise(n = n()) %>%
   ggplot(aes(x=reorder(Scientific_name, -n), y=n, fill=(Scientific_name))) + theme_minimal() + geom_bar(stat="identity", colour="gray", fill="black") +     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Scientific Name")  +
@@ -1259,13 +1272,13 @@ species_bar
 
 ###Create same figure with fill=class
 
-Species_traits_10 <- Species_traits[Species_traits$Scientific_name %in% names(which(table(Species_traits$Scientific_name) > 10)), ]
-dim(Species_traits_10)
+Species_traits_8 <- Species_traits[Species_traits$Scientific_name %in% names(which(table(Species_traits$Scientific_name) > 8)), ]
+dim(Species_traits_8)
 #506   13
 
-Higher_taxon <- Species_traits_10[,c(2,4)]
+Higher_taxon <- Species_traits_8[,c(2,4)]
 
-species_bar <- Species_traits_10 %>% 
+species_bar <- Species_traits_8 %>% 
   group_by(Scientific_name) %>%
   summarise(n = n()) 
 
@@ -1284,7 +1297,7 @@ species_bar_4 <- species_bar_3 %>%
   labs(y = "Count", x = "Scientific species name", fill = "Class") +
   coord_flip() + 
   theme_minimal() +
-  theme(legend.position = "top") +
+  theme(legend.position = "top", axis.text.y = element_text(size = 6)) +
   scale_fill_manual(values = c("light blue", "orange","light yellow", "light green")) +
   theme(legend.position = "top")
 
@@ -1989,6 +2002,9 @@ BioRegion_PublicationYear_heat
 PFAS_Compounds_28 <- left_join(PFAS_Compounds_25, Bibliometrics_5_distinct, by = c("Study_ID" = "Study_ID")) %>%
   group_by(PFAS_name, Publication_year) %>%
   summarise(n = n())
+
+PFAS_Compounds_28_short <- PFAS_Compounds_28 %>% filter (n > 15)
+dim(PFAS_Compounds_28_short)
 
 pfas_PublicationYear_heat <- PFAS_Compounds_28 %>%
   ggplot(aes(reorder(PFAS_name, -n), Publication_year, fill = n,)) + 
