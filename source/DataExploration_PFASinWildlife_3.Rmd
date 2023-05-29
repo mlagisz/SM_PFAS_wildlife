@@ -1915,13 +1915,13 @@ pfas_species_heat_3 <- pfas_species_heat_2 %>% filter (!PFAS_name == 'NA')
 dim(pfas_species_heat_3)
 
 pfas_species_heat_4 <- pfas_species_heat_3 %>% ggplot(aes(reorder(Scientific_name, -n), reorder(PFAS_name, -n),  fill = n)) + 
-  geom_tile() + scale_fill_gradient(low = "white", high = "dark blue", na.value = NA) + theme_minimal() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="PFAS Names", x = "Scientific species name", fill = 'Count') +
+  geom_tile() + scale_fill_gradient(low = "white", high = "black", na.value = NA) + theme_minimal() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="PFAS Names", x = "Scientific species name", fill = 'Count') +
     scale_y_discrete(limits=rev)
 
 pfas_species_heat_4 <- pfas_species_heat_3 %>% 
   ggplot(aes(reorder(Scientific_name, -n), reorder(PFAS_name, -n), fill = n)) + 
   geom_tile() + 
-  scale_fill_gradient(low = "white", high = "dark blue", na.value = NA) + 
+  scale_fill_gradient(low = "white", high = "black", na.value = NA) + 
   theme_minimal() + 
   theme(
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
@@ -2018,6 +2018,9 @@ dim(PFAS_Compounds_28_short)
 
 PFAS_Compounds_28_short_2 <- PFAS_Compounds_28_short %>%
   arrange(n)
+
+PFAS_Compounds_28_3 <- PFAS_Compounds_28 %>%
+  arrange(Publication_year)
 
 pfas_PublicationYear_heat <- PFAS_Compounds_28 %>%
   ggplot(aes(reorder(PFAS_name, -n), Publication_year, fill = n,)) + 
