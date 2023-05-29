@@ -1180,10 +1180,21 @@ PFAS_Compounds_long_short <-
 
 #ggsave("PFAS_Compounds_long_short.jpg", plot = PFAS_Compounds_long_short, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = T)
 
-PFAS_Compounds_long
+##############################
+###Create heatmap with 26 PFAS
 
-PFAS_Compounds_long <- 
- ggplot(data = PFAS_Compounds_21, aes(x = reorder(PFAS_name, -n), y = n, fill = Chain_length)) + 
+PFAS_Compounds_20_order <- PFAS_Compounds_20 %>% arrange(n)
+
+#Delete rows 1-6 (least abundant PFAS)
+
+library(dplyr)
+
+PFAS_Compounds_20_order_short <- PFAS_Compounds_20_order %>% slice(-(1:4))
+
+PFAS_Compounds_20_order_short_2 <- PFAS_Compounds_20_order_short %>% left_join(PFAS_C_length)
+
+PFAS_Compounds_60 <- 
+ ggplot(data = PFAS_Compounds_20_order_short_2, aes(x = reorder(PFAS_name, -n), y = n, fill = Chain_length)) + 
   geom_bar(stat = "identity") + 
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1)) + 
   labs(y = "Count", x = "PFAS compounds", fill = 'Carbon chain length') + 
@@ -1191,10 +1202,9 @@ PFAS_Compounds_long <-
   theme(legend.position = "top") +
   scale_fill_manual(values = c("black", "grey"))
 
+PFAS_Compounds_60
 
-PFAS_Compounds_long
-
-#ggsave("PFAS_Compounds_long.jpg", plot = PFAS_Compounds_long, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = T)
+#ggsave("PFAS_Compounds_60.jpg", plot = PFAS_Compounds_60, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = T)
 
 ##########
   ggplot(data = PFAS_Compounds_21,
@@ -1996,7 +2006,7 @@ BioRegion_PublicationYear_heat
 ```
 
 
-### Heatmap PFAS by Publicaion year
+### Heatmap PFAS by Publication year
 ```{r, echo=FALSE}
 
 PFAS_Compounds_28 <- left_join(PFAS_Compounds_25, Bibliometrics_5_distinct, by = c("Study_ID" = "Study_ID")) %>%
@@ -2006,6 +2016,9 @@ PFAS_Compounds_28 <- left_join(PFAS_Compounds_25, Bibliometrics_5_distinct, by =
 PFAS_Compounds_28_short <- PFAS_Compounds_28 %>% filter (n > 15)
 dim(PFAS_Compounds_28_short)
 
+PFAS_Compounds_28_short_2 <- PFAS_Compounds_28_short %>%
+  arrange(n)
+
 pfas_PublicationYear_heat <- PFAS_Compounds_28 %>%
   ggplot(aes(reorder(PFAS_name, -n), Publication_year, fill = n,)) + 
   geom_tile() +
@@ -2013,8 +2026,29 @@ pfas_PublicationYear_heat <- PFAS_Compounds_28 %>%
   theme(legend.position = "top")
 pfas_PublicationYear_heat
 
-#ggsave("pfas_PublicationYear_heat.jpg", plot = pfas_PublicationYear_heat, device = 'jpg', width = 168, height = 100, units = "mm",
-#      dpi = 300, limitsize = TRUE)
+pfas_PublicationYear_heat <- PFAS_Compounds_28 %>%
+  ggplot(aes(reorder(PFAS_name, -n), Publication_year, fill = n,)) + 
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "black", na.value = NA) + theme(axis.text.x = element_text(face = 'bold', colour = 'red', size = 8, angle = 45), axis.text.y = element_text(size = 6)) + labs(y="Publication year", x = "PFAS Compounds", fill = 'Count') + theme_minimal() + coord_flip() +
+  theme(legend.position = "top")
+
+PFAS_Compounds_28 %>%
+  ggplot(aes(reorder(PFAS_name, -n), Publication_year, fill = n)) + 
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "black", na.value = NA) +
+  theme(
+    axis.text.x = element_text(face = 'bold', colour = 'red', size = 8, angle = 45),
+    axis.text = element_text(size = 14),  # Modify the font size (change 14 to your desired size)
+    axis.title.y = element_text(size = 14)  # Modify the font size (change 14 to your desired size)
+  ) +
+  labs(y = "Publication year", x = "PFAS Compounds", fill = 'Count') +
+  theme_minimal() +
+  coord_flip() +
+  theme(legend.position = "top")
+
+pfas_PublicationYear_heat
+
+#ggsave("pfas_PublicationYear_heat.jpg", plot = pfas_PublicationYear_heat, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 ```
 
 
