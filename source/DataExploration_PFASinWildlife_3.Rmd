@@ -1872,7 +1872,19 @@ pfas_habitat_heat <- PFAS_Habitat %>%
 
 pfas_habitat_heat
 
-#ggsave("pfas_habitat_heat.jpg", plot = pfas_habitat_heat, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+pfas_habitat_heat_black <- PFAS_Habitat %>%
+  ggplot(aes (y = reorder(Habitat, -n),x = reorder(PFAS_name, -n), fill = n)) + 
+  geom_tile()  + 
+  theme_minimal() +  
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ 
+  scale_fill_gradient (low = "white", high = "black", na.value = NA) +
+  theme() +
+  labs(y="Habitat", x = "PFAS Compounds", fill = 'Count') +
+  theme(legend.position = "top")
+
+pfas_habitat_heat_black
+
+#ggsave("pfas_habitat_heat_black.jpg", plot = pfas_habitat_heat_black, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 ```
 
 ### Heatmap PFAS by Biogeographical region
@@ -1892,7 +1904,17 @@ pfas_biogeographic_heat <- PFAS_Compounds_27 %>%
 
   pfas_biogeographic_heat
 
-#ggsave("pfas_biogeographic_heat.jpg", plot = pfas_biogeographic_heat, device = 'jpg', width = 168, height = 100, units = "mm",dpi = 300, limitsize = TRUE)
+pfas_biogeographic_heat_black <- PFAS_Compounds_27 %>%
+  ggplot(aes(y = reorder(Biogeographical_region, -n), x = reorder(PFAS_name, -n), fill = n,)) + 
+  geom_tile() +
+  geom_tile() +
+  theme_minimal() + 
+  scale_fill_gradient(low = "white", high = "black", na.value = NA) + theme(axis.text.x = element_text(face = 'bold', colour = 'red', size = 12, angle = 45), axis.text.y = element_text(size = 12)) + labs(y="Biogeographical Region", x = "PFAS Compounds", fill = 'Count') + theme_minimal()  +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position = "top")
+
+pfas_biogeographic_heat_black
+  
+#ggsave("pfas_biogeographic_heat_black.jpg", plot = pfas_biogeographic_heat_black, device = 'jpg', width = 168, height = 100, units = "mm",dpi = 300, limitsize = TRUE)
 ```
 
 ### PFAS vs. Species Heatmap
@@ -1999,9 +2021,16 @@ labs(y="Publication year", x = "Biogeographical region", fill = 'Count') + coord
 
 BioRegion_PublicationYear_heat
 
+BioRegion_PublicationYear_heat_black <- PFAS_Compounds_30 %>%
+  ggplot(aes(reorder(Biogeographical_region, -n), Publication_year, fill = n,)) + 
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "black", na.value = NA) + theme(axis.text.x = element_text(face = 'bold', colour = 'red', size = 12, angle = 45), axis.text.y = element_text(size = 12)) + geom_tile(color = "white",lwd = 1.5,linetype = 1)+ 
+labs(y="Publication year", x = "Biogeographical region", fill = 'Count') + coord_flip()+ theme_minimal()+
+  theme(legend.position = "top")
 
-#ggsave("BioRegion_PublicationYear_heat.jpg", plot = BioRegion_PublicationYear_heat, device = 'jpg', width = 168, height = 100, units = "mm",
-#       dpi = 300, limitsize = TRUE)
+BioRegion_PublicationYear_heat_black
+
+#ggsave("BioRegion_PublicationYear_heat_black.jpg", plot = BioRegion_PublicationYear_heat_black, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 
 ```
 
