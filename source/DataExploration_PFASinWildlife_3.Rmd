@@ -1021,6 +1021,15 @@ Publication_year_bar <- Bibliometrics_5_distinct %>%
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + labs(y="Count", x = "Publication Year")  +
   scale_x_continuous(breaks = c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,2021, 2022))
 
+Publication_year_bar <- Bibliometrics_5_distinct %>%
+  ggplot(aes(x = Publication_year)) +
+  geom_bar(alpha = 0.7, fill = "steelblue", color = "transparent") +  # Set color to "transparent"
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  labs(y = "Count", x = "Publication Year") +
+  scale_x_continuous(breaks = c(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022))
+
+
 Publication_year_bar
 
 #ggsave("Publication_year_bar.jpg", plot = Publication_year_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
@@ -1327,6 +1336,7 @@ IUCN_bar <- Species_traits %>%
   labs(y="Count", x = "IUCN Redlist Category")
 
 IUCN_bar
+
 
 #ggsave("IUCN_bar.jpg", plot = IUCN_bar, device = 'jpg', width = 168, height = 100, units = #"mm", dpi = 300, limitsize = TRUE)
 
@@ -1870,16 +1880,14 @@ pfas_habitat_heat <- PFAS_Habitat %>%
   labs(y="Habitat", x = "PFAS Compounds", fill = 'Count') +
   theme(legend.position = "top")
 
-pfas_habitat_heat
-
 pfas_habitat_heat_black <- PFAS_Habitat %>%
-  ggplot(aes (y = reorder(Habitat, -n),x = reorder(PFAS_name, -n), fill = n)) + 
-  geom_tile()  + 
-  theme_minimal() +  
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ 
-  scale_fill_gradient (low = "white", high = "black", na.value = NA) +
-  theme() +
-  labs(y="Habitat", x = "PFAS Compounds", fill = 'Count') +
+  ggplot(aes(y = reorder(Habitat, -n), x = reorder(PFAS_name, -n), fill = n)) +
+  geom_tile() +
+  coord_equal() +  # Add this line to make cells square
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  scale_fill_gradient(low = "white", high = "black", na.value = NA) +
+  labs(y = "Habitat", x = "PFAS Compounds", fill = 'Count') +
   theme(legend.position = "top")
 
 pfas_habitat_heat_black
@@ -1910,7 +1918,8 @@ pfas_biogeographic_heat_black <- PFAS_Compounds_27 %>%
   geom_tile() +
   theme_minimal() + 
   scale_fill_gradient(low = "white", high = "black", na.value = NA) + theme(axis.text.x = element_text(face = 'bold', colour = 'red', size = 12, angle = 45), axis.text.y = element_text(size = 12)) + labs(y="Biogeographical Region", x = "PFAS Compounds", fill = 'Count') + theme_minimal()  +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position = "top")
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position = "top") +
+  coord_equal()
 
 pfas_biogeographic_heat_black
   
@@ -2312,7 +2321,8 @@ ggplot(Habitat_Species_count, aes(x= reorder(Habitat, -n), y = reorder(Species_h
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   scale_fill_discrete(name= 'Count') +
   scale_x_discrete(limits = c("Marine", "Terrestrial coastal", "Estuarine", "Terrestrial inland",  "Freshwater", "Mixed")) +
-    scale_y_discrete(limits=rev)
+    scale_y_discrete(limits=rev) +
+  theme(legend.position = "top")
 
 #ggsave("Habitat_Species_bubble.jpg", plot = Habitat_Species_bubble, device = 'jpg', width = 150, height = 150, units = "mm", dpi = 300, limitsize = TRUE)
 
@@ -2355,7 +2365,9 @@ Region_Species_bubble <- ggplot(Region_Species_count, aes(x= reorder(Biogeograph
   labs(y="Classes", x = "Biogeographical region") + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   scale_x_discrete(limits = c( "Polar", "Temperate",   "Subtropical",  "Tropical", "Mixed"))+
-    scale_y_discrete(limits=rev)
+    scale_y_discrete(limits=rev) +
+  theme(legend.position = "top")
+
 
 #ggsave("Region_Species_bubble.jpg", plot = Region_Species_bubble, device = 'jpg', width = 150, height = 150, units = "mm", dpi = 300, limitsize = TRUE)
 
@@ -2380,8 +2392,19 @@ ggplot(Sampling_Period_Class_no_NA_SHORT_2, aes(x=Species_higher_taxon, y=Sampli
   scale_fill_manual(values = c("Actinopterygii"="blue", "Aves"="red", "Mammalia"="green", "Malacostraca"="orange", "Bivalvia"="purple", "Gastropoda"="yellow", "Reptilia"="dark gray", "Insecta"="brown", "Cephalopoda"="pink", "Chondrichthyes"="light gray")) +
   guides(fill = FALSE)
 
+Sampling_period_plot_grey <- 
+ggplot(Sampling_Period_Class_no_NA_SHORT_2, aes(x=Species_higher_taxon, y=SamplingPeriod, fill=Species_higher_taxon)) + 
+  geom_violin() +
+  geom_jitter(shape=16, position=position_jitter(0.2)) +
+  labs(x="Class", y = "Sampling period in years") + 
+  theme_minimal()  +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  +
+  scale_x_discrete(limits = c("Actinopterygii", "Aves", "Mammalia","Malacostraca","Bivalvia", "Gastropoda", "Reptilia", "Insecta", "Cephalopoda", "Chondrichthyes")) + 
+  scale_fill_manual(values = c("Actinopterygii"="light grey", "Aves"="light grey", "Mammalia"="light grey", "Malacostraca"="light grey", "Bivalvia"="light grey", "Gastropoda"="light grey", "Reptilia"="light grey", "Insecta"="light grey", "Cephalopoda"="light grey", "Chondrichthyes"="light grey")) +
+  guides(fill = FALSE)
 
-#ggsave("Sampling_period_plot.jpg", plot = Sampling_period_plot, device = 'jpg', width = 200, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+#ggsave("Sampling_period_plot_grey.jpg", plot = Sampling_period_plot_grey, device = 'jpg', width = 200, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 
 
 ```
