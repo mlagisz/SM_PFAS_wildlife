@@ -254,7 +254,7 @@ Most productive authors in terms of numbers of publications
 
 Authors <- bib_sco %>% select(AU, PY, longID) %>% separate_rows(AU, sep = ";") #split rows with multiple values
 
-count(Authors, AU) %>%
+top_authors_plot <- count(Authors, AU) %>%
   arrange(n) %>%
   filter(!is.na(AU)) %>%
   top_n(20) %>% 
@@ -270,6 +270,18 @@ count(Authors, AU) %>%
 ggsave(filename = here("plots", "Figure_top20authors.pdf"),
        height = 5, width = 10,
        device = cairo_pdf)
+
+ggsave(
+  filename = here("plots", "Figure_top20authors.pdf"),
+  height = 5, width = 10,
+  device = cairo_pdf,
+  dpi = 300  # Set the desired resolution (e.g., 300 dpi)
+)
+
+
+ggsave("top_authors_plot.jpg", plot = top_authors_plot, device = 'jpg',
+  width = 300, height = 150, units = "mm", dpi = 300, limitsize = TRUE)
+
 ```
 
 
@@ -572,7 +584,7 @@ Institutions$AU_UN2 <- str_replace_all(Institutions$AU_UN, c('\\(AT THE TIME OF 
 #sort(unique(Institutions$AU_UN2)) #much better
 
 #remove duplicated affiliations within papers, count papers per institutional affiliation and plot:
-Institutions %>% distinct(PY, longID, AU_UN2, .keep_all=TRUE) %>%
+Top_Institutions_plot <- Institutions %>% distinct(PY, longID, AU_UN2, .keep_all=TRUE) %>%
   count(AU_UN2) %>%
   filter(!is.na(AU_UN2)) %>%
   arrange(n) %>%
@@ -589,6 +601,10 @@ Institutions %>% distinct(PY, longID, AU_UN2, .keep_all=TRUE) %>%
 ggsave(filename = here("plots", "Figure_top20institutions.pdf"),
        height = 5, width = 10,
        device = cairo_pdf)
+
+ggsave("Top_Institutions_plot.jpg", plot = Top_Institutions_plot, device = 'jpg',
+  width = 300, height = 150, units = "mm", dpi = 300, limitsize = TRUE)# Set the desired resolution (e.g., 500 dpi)
+
 ```
 
 
