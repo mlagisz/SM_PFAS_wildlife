@@ -432,14 +432,26 @@ Species_distinct <- Species_2 %>% distinct(Study_ID, Scientific_name,  .keep_all
 dim(Species_distinct)
 #2356        3
 
-Species_distinct_2 <- Species_distinct %>% distinct(Study_ID, Lay_name,  .keep_all = TRUE)
-dim(Species_distinct_2)
-#2355    3
+Species_distinct %>% distinct(Scientific_name)
+Species_distinct %>% distinct(Lay_name)
 
-Species_distinct_2 %>% distinct(Scientific_name)
-Species_distinct_2 %>% distinct(Lay_name)
+#How many Scientific names
+unique_Scientific_name <- unique(Species_traits$Scientific_name)
+length(unique_Scientific_name)
+#1042
 
-table_species <- Species_distinct_2 %>%
+#How many lay names
+unique_Lay_names <- unique(Species_traits$Lay_name)
+length(unique_Lay_names)
+#1044
+
+#How many Species_higher_taxon
+unique_taxon <- unique(Species_traits$Species_higher_taxon)
+length(unique_taxon)
+#26
+
+
+table_species <- Species_distinct %>%
   group_by(Scientific_name) %>%
   summarize(n_studies = n_distinct(Study_ID)) %>%
   arrange(desc(n_studies))
@@ -470,7 +482,6 @@ Species_traits_species <- Species_traits %>% filter (Name_tax_rank== 'species')
 dim(Species_traits_species)
 
 Species_traits_species %>% distinct(Scientific_name)
-#886
 
 Species_traits_HigherTaxa <- Species_traits %>% filter (!Name_tax_rank== 'species')
 Species_traits_HigherTaxa %>% distinct(Scientific_name)
@@ -488,7 +499,9 @@ table_species_lay %>%
 
 #How many lay names?
 Species_traits_species %>% distinct(Lay_name)
-#886
+
+unique_names <- unique(Species_traits$Scientific_name)
+length(unique_names)
 
 
 #Class
@@ -1325,23 +1338,30 @@ species_bar_4 <- species_bar_3 %>%
 
 
 #Bar plot IUCN status
-IUCN_bar <- Species_traits %>% 
+IUCN_bar <- Species_traits_unique %>%
   group_by(redlistCategory) %>%
   summarise(n = n()) %>%
-  ggplot(aes(x=reorder(redlistCategory, -n), y=n)) + 
-    geom_bar(stat="identity") + 
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  coord_flip() + 
-  theme_minimal() + 
-  labs(y="Count", x = "IUCN Redlist Category")
+  ggplot(aes(x = reorder(redlistCategory, -n), y = n)) + 
+    geom_bar(stat = "identity") + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    coord_flip() + 
+    theme_minimal() + 
+    labs(y = "Count", x = "IUCN Redlist Category") +
+    theme(axis.text.y = element_text(angle = 45, vjust = 0.5, hjust = 0.5)) # Set angle for y-axis label
+
 
 IUCN_bar
 
 
-#ggsave("IUCN_bar.jpg", plot = IUCN_bar, device = 'jpg', width = 168, height = 100, units = #"mm", dpi = 300, limitsize = TRUE)
+ggsave("IUCN_bar.jpg", plot = IUCN_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+ggsave("Economy_bar.jpg", plot = Economy_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
+
+#Before plotting Economy_bar, we need to kick out the duplicate rows of the same species
+Species_traits_unique <- Species_traits[!duplicated(Species_traits$Scientific_name), ]
+dim(Species_traits_unique)
 
 #Bar plot economical relevance
-Economy_bar <- Species_traits %>% 
+Economy_bar <- Species_traits_unique %>% 
   group_by(Economically_relevant) %>%
   summarise(n = n()) %>%
   ggplot(aes(x=reorder(Economically_relevant, -n), y=n)) + 
@@ -1356,8 +1376,12 @@ Economy_bar
 #ggsave("Economy_bar.jpg", plot = Economy_bar, device = 'jpg', width = 168, height = 100, units = "mm", dpi = 300, limitsize = TRUE)
 
 
+#Before plotting Charisma_bar, we need to kick out the duplicate rows of the same species
+Species_traits_unique <- Species_traits[!duplicated(Species_traits$Scientific_name), ]
+dim(Species_traits_unique)
+
 #Bar plot Charisma
-Charisma_bar <- Species_traits %>% 
+Charisma_bar <- Species_traits_unique %>% 
   group_by(Charismatic_species) %>%
   summarise(n = n()) %>%
   ggplot(aes(x=reorder(Charismatic_species, -n), y=n)) + 
@@ -1376,7 +1400,7 @@ dim(Species_traits)
 
 Species_traits_noNA <- na.omit(Species_traits)
 
-Diet_bar <- Species_traits_noNA %>% 
+Diet_bar <- Species_traits_unique %>% 
   group_by(Dietary_class) %>%
   summarise(n = n()) %>%
   ggplot(aes(x=reorder(Dietary_class, -n), y=n)) + 
@@ -2248,6 +2272,7 @@ saveNetwork(sankeyNetwork_plot_2_large, "sankeyNetwork_plot_2_large.html")
 
 # you convert it as png
 webshot("sankeyNetwork_plot_2_large.html","sankeyNetwork_plot_2_large.png")
+
 
 #######################
 ###Experiment with less countries/ sampling locations
