@@ -2246,6 +2246,7 @@ sankeyNetwork_plot <- sankeyNetwork(Links = sankey_author, Nodes = nodes,
                    
 sankeyNetwork_plot
 
+
 #Save figure
 
 # save it as an html
