@@ -440,6 +440,23 @@ unique_Scientific_name <- unique(Species_traits$Scientific_name)
 length(unique_Scientific_name)
 #1042
 
+
+# Group by Study_ID and count unique species
+species_count <- Species %>%
+  group_by(Study_ID) %>%
+  summarise(num_species = n_distinct(Scientific_name))
+
+# Calculate average and median
+average_species <- mean(species_count$num_species)
+median_species <- median(species_count$num_species)
+
+# Print the results
+cat("Average number of species:", average_species, "\n")
+#Average number of species: 4.055077 
+
+cat("Median number of species:", median_species, "\n")
+#Median number of species: 2 
+
 #How many lay names
 unique_Lay_names <- unique(Species_traits$Lay_name)
 length(unique_Lay_names)
@@ -2241,7 +2258,7 @@ sankey_author$IDtarget <- match(sankey_author$target_sample, nodes$name)-1
 
 #Make the Network
 sankeyNetwork_plot <- sankeyNetwork(Links = sankey_author, Nodes = nodes,
-                   Source = "IDsource", Target = "IDtarget", Value = "n", NodeID = "name", fontSize = 10,
+                   Source = "IDsource", Target = "IDtarget", Value = "n", NodeID = "name", fontSize = 15,
                    sinksRight=FALSE)
                    
 sankeyNetwork_plot
@@ -2253,7 +2270,8 @@ sankeyNetwork_plot
 saveNetwork(sankeyNetwork_plot, "sankeyNetwork_plot.html")
 
 # you convert it as png
-webshot("sankeyNetwork_plot.html","sankeyNetwork_plot.png", width = 1000, vheight = 900)
+webshot("sankeyNetwork_plot.html", file = "sankeyNetwork_plot.png", vwidth = 1000, vheight = 900)
+
 
 # Swap around target and source
 sankey_author$IDsource <- match(sankey_author$source_author, nodes$name)-1 
